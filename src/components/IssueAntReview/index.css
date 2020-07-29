@@ -1,0 +1,10 @@
+.issueAntReview {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 500px;
+  align-items: center;
+}
+
+#issueAntReviewForm {
+  min-width: 500px;
+}

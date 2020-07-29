@@ -1,3 +1,16 @@
+/* Antd Dependency */
+@import '~antd/dist/antd.css';
+
+/* Layout Stlyes */
+.ant-layout-header {
+  background-color: transparent;
+}
+
+.ant-layout {
+  background-color: transparent;
+}
+
+/* CRA Styles */
 .App {
   text-align: center;
 }
