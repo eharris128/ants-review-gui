@@ -68,8 +68,8 @@ class Header extends React.Component {
             </Button>,
           ]}
         />
-        <Greeting hasStartedIssueWorkflow={hasStartedIssueWorkflow} />
-        {workflow}
+        {/* <Greeting hasStartedIssueWorkflow={hasStartedIssueWorkflow} />
+        {workflow} */}
       </div>
     );
   }
