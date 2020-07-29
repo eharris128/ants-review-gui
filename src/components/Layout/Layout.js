@@ -7,6 +7,8 @@ import Icon, { HeartOutlined} from "@ant-design/icons";
 
 import { Header } from "../Header";
 import { Sider } from "../Sider";
+import { IssueAntReview } from '../IssueAntReview'
+import { FulfillAntReview } from '../FulfillAntReview'
 import "./index.css";
 // const { Title } = Typography;
 
@@ -37,7 +39,9 @@ const AntReviewLayout = () => {
             className="site-layout-background"
             style={{ padding: 24, minHeight: 360 }}
           >
-            Some Starter Text.
+            {/* Some Starter Text. */}
+            <IssueAntReview />
+            <FulfillAntReview />
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>

@@ -1,0 +1,11 @@
+.fulfillAntReview {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 500px;
+    align-items: center;
+  }
+  
+  #fulfillAntReviewForm {
+    min-width: 500px;
+  }
+  
