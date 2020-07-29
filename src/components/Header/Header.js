@@ -1,6 +1,6 @@
 import React from "react";
 
-import { PageHeader, Button } from "antd";
+import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 import { IssueAntReview } from "../IssueAntReview";
@@ -52,22 +52,16 @@ class Header extends React.Component {
     }
     return (
       <div>
-        <PageHeader
-          ghost={false}
-          className="site-page-header"
-          title="Ants-Review"
-          extra={[
-            <Button
-              onClick={() => console.log("Start Issue AntReview Workflow")}
-              icon={<PlusOutlined />}
-              size="large"
-              key="1"
-              type="primary"
-            >
-              Issue AntReview
-            </Button>,
-          ]}
-        />
+        <Button
+          onClick={() => console.log("Start Issue AntReview Workflow")}
+          icon={<PlusOutlined />}
+          size="large"
+          key="1"
+          type="primary"
+        >
+          Issue AntReview
+        </Button>
+        
         {/* <Greeting hasStartedIssueWorkflow={hasStartedIssueWorkflow} />
         {workflow} */}
       </div>

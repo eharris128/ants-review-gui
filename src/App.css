@@ -4,6 +4,10 @@
 /* Layout Stlyes */
 .ant-layout-header {
   background-color: transparent;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  margin-right: 5%
 }
 
 .ant-layout {
