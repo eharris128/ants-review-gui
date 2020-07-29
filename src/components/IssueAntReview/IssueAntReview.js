@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 
-import useWeb3 from "./use-web3";
+import useWeb3 from "../../utils/use-web3";
+import isContractInteractable from '../../utils/isContractInteractable'
 import AntReviewForm from "./AntReviewForm";
 import "./index.css";
-
-const canInteractWithContract = (
-  web3Instance,
-  networkID,
-  antsReviewInstance,
-  accounts
-) => web3Instance && networkID && antsReviewInstance && accounts;
 
 const sendIssueTx = async (
   web3,
@@ -32,7 +26,7 @@ const IssueAntReview = () => {
   async function handleFormSubmit(newAntReview) {
     setAntReview(newAntReview);
     if (
-      canInteractWithContract(web3, networkID, antsReviewInstance, accounts)
+      isContractInteractable(web3, networkID, antsReviewInstance, accounts)
     ) {
       await sendIssueTx(
         web3,

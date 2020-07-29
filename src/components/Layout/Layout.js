@@ -1,22 +1,21 @@
 import React, { useState } from "react";
 
 import { Layout } from "antd";
-// import { Layout, Typography } from "antd";
-
-import Icon, { HeartOutlined} from "@ant-design/icons";
+import Icon, { HeartOutlined } from "@ant-design/icons";
 
 import { Header } from "../Header";
 import { Sider } from "../Sider";
-import { IssueAntReview } from '../IssueAntReview'
-import { FulfillAntReview } from '../FulfillAntReview'
+import { Dashboard } from "../Dashboard";
 import "./index.css";
-// const { Title } = Typography;
 
 const AntReviewLayout = () => {
-  
   const [collapsed, setCollapsed] = useState(null);
+
   const { Header: DesignHeader, Footer, Sider: DesignSider, Content } = Layout;
-  const CustomHeart = props => <Icon component={HeartOutlined} {...props} />
+  const CustomHeart = (props) => <Icon component={HeartOutlined} {...props} />;
+
+  const handleMenuClick = (event) => { console.log('menu click handler stub', event)};
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <DesignSider
@@ -25,10 +24,7 @@ const AntReviewLayout = () => {
         collapsed={collapsed}
         onCollapse={setCollapsed}
       >
-        {/* <Title className="ants-review-header" level={2}>
-          Ants-Review
-        </Title> */}
-        <Sider />
+        <Sider handleMenuClick={handleMenuClick} />
       </DesignSider>
       <Layout className="site-layout">
         <DesignHeader className="site-layout-background" style={{ padding: 0 }}>
@@ -39,9 +35,7 @@ const AntReviewLayout = () => {
             className="site-layout-background"
             style={{ padding: 24, minHeight: 360 }}
           >
-            {/* Some Starter Text. */}
-            <IssueAntReview />
-            <FulfillAntReview />
+            <Dashboard />
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>

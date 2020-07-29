@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import AntsReview from "../../contracts/AntsReview.json";
-import getWeb3 from "../../utils/getWeb3";
+import AntsReview from "../contracts/AntsReview.json";
+import getWeb3 from "./getWeb3";
 
 const useWeb3 = () => {
   const [web3Instance, setWeb3Instance] = useState(null);

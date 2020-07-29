@@ -9,25 +9,32 @@ import {
 const { SubMenu } = Menu;
 
 class Sider extends React.Component {
-  handleClick = (e) => {
-    console.log("click ", e);
+  handleClick = (e, handleMenuClick) => {
+    const { key } = e;
+    handleMenuClick(key);
   };
 
   render() {
+    const { handleMenuClick } = this.props;
+
     return (
       <Menu
-        onClick={this.handleClick}
+        onClick={(e) => this.handleClick(e, handleMenuClick)}
         defaultSelectedKeys={["1"]}
         defaultOpenKeys={["sub1"]}
         mode="inline"
       >
-        <SubMenu icon={<ContainerOutlined />} key="sub1" title="Authors">
-          <Menu.Item icon={<DashboardOutlined />} key="1">
+        <SubMenu
+          icon={<ContainerOutlined />}
+          key="authorSubmenu"
+          title="Authors"
+        >
+          <Menu.Item icon={<DashboardOutlined />} key="authorDashboard">
             Dashboard
           </Menu.Item>
         </SubMenu>
         <SubMenu
-          key="sub2"
+          key="peerReviewerSubmenu"
           title={
             <>
               <EditOutlined />
@@ -37,7 +44,7 @@ class Sider extends React.Component {
             </>
           }
         >
-          <Menu.Item icon={<DashboardOutlined />} key="2">
+          <Menu.Item icon={<DashboardOutlined />} key="peerReviewerDashboard">
             Dashboard
           </Menu.Item>
         </SubMenu>
