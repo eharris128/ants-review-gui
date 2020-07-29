@@ -1,7 +1,10 @@
 import React from "react";
 
+import { Skeleton, Typography, Card, Button } from "antd";
+
 import getWeb3 from "../../utils/getWeb3";
 import AntsReview from "../../contracts/AntsReview.json";
+import weiToEth from "../../utils/weiToEth";
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -10,7 +13,7 @@ class Dashboard extends React.Component {
     this.state = {
       web3: null,
       antsReviewInstance: null,
-      antreviews: [],
+      antReviews: [],
     };
   }
   componentDidMount = async () => {
@@ -44,17 +47,49 @@ class Dashboard extends React.Component {
     this.state.antsReviewInstance.events
       .AntReviewIssued({ fromBlock: 0 })
       .on("data", async (event) => {
-        var newAntReviewArray = component.state.antreviews.slice();
+        let newAntReviewArray = component.state.antReviews.slice();
         newAntReviewArray.push(event.returnValues);
-        component.setState({ antreviews: newAntReviewArray });
+        component.setState({ antReviews: newAntReviewArray });
       })
       .on("error", console.error);
   };
   render() {
-    const { antreviews } = this.state;
-    console.log(" antreviews", antreviews);
-    // 
-    return <div>Dashboard</div>;
+    const { Title } = Typography;
+
+    const { antReviews } = this.state;
+
+    const displayAntReviews = (antReviews) => {
+      return antReviews.map((antReview) => {
+        return (
+          <Card
+            title={antReview.data}
+            style={{ width: 500, "margin-bottom": "2rem" }}
+          >
+            <p>Reward - {weiToEth(antReview.amount)} ETH</p>
+            <p>Author - {antReview.issuer}</p>
+            <Button>Fulfill</Button>
+          </Card>
+        );
+      });
+    };
+    const displaySkeleton = () => {
+      // To be removed as soon as possible...
+      const mockCards = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      return mockCards.map((_) => {
+        return (
+          <Card
+            loading={true}
+            style={{ width: 500, "margin-bottom": "2rem" }}
+          ></Card>
+        );
+      });
+    };
+    return (
+      <>
+        <Title level={2}>Open AntReviews</Title>
+        {antReviews.length ? displayAntReviews(antReviews) : displaySkeleton()}
+      </>
+    );
   }
 }
 
