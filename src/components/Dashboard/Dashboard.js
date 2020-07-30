@@ -19,6 +19,7 @@ class Dashboard extends React.Component {
       fulfilledAntReviews: [],
       displayFulfillAntReviewView: false,
       cancelledAntReviews: [],
+      acceptedAntReviews: [],
     };
   }
   componentDidMount = async () => {
@@ -46,6 +47,7 @@ class Dashboard extends React.Component {
       this.listenAntReviewIssuedEvent(this);
       this.listenAntReviewFulfilledEvent(this);
       this.listenAntReviewCancelledEvent(this);
+      this.listenAntReviewAcceptedEvent(this);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -88,6 +90,17 @@ class Dashboard extends React.Component {
       .on("error", console.error);
   };
 
+  listenAntReviewAcceptedEvent = (component) => {
+    this.state.antsReviewInstance.events
+      .FulfillmentAccepted({ fromBlock: 0 })
+      .on("data", async (event) => {
+        let acceptedAntReviewArray = component.state.acceptedAntReviews.slice();
+        acceptedAntReviewArray.push(event.returnValues);
+        component.setState({ acceptedAntReviews: acceptedAntReviewArray });
+      })
+      .on("error", console.error);
+  };
+
   render() {
     const { Title } = Typography;
     const { displayIssueAntReviewView } = this.props;
@@ -101,10 +114,8 @@ class Dashboard extends React.Component {
       accounts,
       fulfilledAntReviews,
       cancelledAntReviews,
+      acceptedAntReviews,
     } = this.state;
-    // console.log('new phone who dis', cancelledAntReviews)
-
-    // an ant review can only be displayed if it has not yet been cancelled
 
     // fulfill workflow
     const handleFulfillClick = (e, antReviewID) => {
@@ -133,6 +144,7 @@ class Dashboard extends React.Component {
     // cancel workflow
     const handleCancelClick = (e, antReviewID) => {
       // Later, add a 'Are you sure you want to cancel' modal, etc...
+      // antd Popup -> see antd components space page.
       cancelAntReview(antReviewID);
     };
 
@@ -204,6 +216,14 @@ class Dashboard extends React.Component {
       return fulfilledAntReviews.map((fulfilledAntReview, index) => {
         const { antReview_id: antReviewID } = fulfilledAntReview;
 
+        // ONLY if the fulfillment has not already been accepted
+        // THEN we check to confirm that it is the current user's review
+        const skipDisplayingAntReview = acceptedAntReviews.find(
+          (acceptedReview) => acceptedReview._antReviewId === antReviewID
+        );
+        if (skipDisplayingAntReview) {
+          return null;
+        }
         // ONLY if the antReviewID of the current fulfillment maps to an antReview in the antReviews state variable where the issuer of that antReview is the current user
         // THEN we display the card block
         const isCurrentUsersFulfilledAntReview = (antReviewID) =>
