@@ -10,6 +10,9 @@ import "./index.css";
 
 const AntReviewLayout = () => {
   const [collapsed, setCollapsed] = useState(null);
+  const [displayIssueAntReviewView, setDisplayIssueAntReviewView] = useState(
+    false
+  );
 
   const { Header: DesignHeader, Footer, Sider: DesignSider, Content } = Layout;
   const CustomHeart = (props) => <Icon component={HeartOutlined} {...props} />;
@@ -18,6 +21,9 @@ const AntReviewLayout = () => {
     console.log("menu click handler stub", event);
   };
 
+  const handleIssueClick = () => {
+    setDisplayIssueAntReviewView(true);
+  };
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <DesignSider
@@ -30,7 +36,7 @@ const AntReviewLayout = () => {
       </DesignSider>
       <Layout className="site-layout">
         <DesignHeader className="site-layout-background" style={{ padding: 0 }}>
-          <Header />
+          <Header handleIssueClick={handleIssueClick} />
         </DesignHeader>
         <Content style={{ margin: "0 16px" }}>
           <div
@@ -39,11 +45,11 @@ const AntReviewLayout = () => {
               padding: 24,
               minHeight: 360,
               display: "flex",
-              "flexFlow": "row nowrap",
-              "justifyContent": "space-around",
+              flexFlow: "row nowrap",
+              justifyContent: "space-around",
             }}
           >
-            <Dashboard />
+            <Dashboard displayIssueAntReviewView={displayIssueAntReviewView} />
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>

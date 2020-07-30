@@ -6,6 +6,7 @@ import { FulfillAntReview } from "../FulfillAntReview";
 import getWeb3 from "../../utils/getWeb3";
 import AntsReview from "../../contracts/AntsReview.json";
 import weiToEth from "../../utils/weiToEth";
+import IssueAntReview from "../IssueAntReview/IssueAntReview";
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -75,7 +76,8 @@ class Dashboard extends React.Component {
   };
   render() {
     const { Title } = Typography;
-
+    const { displayIssueAntReviewView } = this.props;
+    
     const {
       web3,
       antsReviewInstance,
@@ -109,8 +111,21 @@ class Dashboard extends React.Component {
       openFulfillAntReview();
     };
 
+    const acceptAndReview = async (antReviewID, fulfillmentID) => {
+      await antsReviewInstance.methods
+        .acceptFulfillment(antReviewID, fulfillmentID)
+        .send({ from: accounts });
+    };
+
+    const handleAcceptClick = (e, antReviewID, fulfillmentID) => {
+      // Later, when a view likely pops up to confirm details prior to approval
+      // this may be the best point of extension
+      acceptAndReview(antReviewID, fulfillmentID);
+    };
+
     const displayOpenAntReviews = (antReviews) => {
-      // TODO (UI or Smart contract?) - only display / return open ant reviews that are 'fulfillable' (e.g. the author of an ant review should not be able to see it under the `Open AntReviews` list)
+      // TODO (UI) - only display / return open ant reviews that are 'fulfillable' (e.g. the author of an ant review should not be able to see it under the `Open AntReviews` list)
+      // Also, not expired
       return antReviews.map((antReview, index) => {
         // Currently the most recent antReview shows up at the bottom of the list
         const {
@@ -120,9 +135,9 @@ class Dashboard extends React.Component {
         } = antReview;
         return (
           <Card
-          key={index}
+            key={index}
             title={antReview.data}
-            style={{ width: 500, "marginBottom": "2rem" }}
+            style={{ width: 500, marginBottom: "2rem" }}
           >
             <p>Reward - {weiToEth(rewardAmount)} ETH</p>
             <p>Author - {issuer}</p>
@@ -134,49 +149,69 @@ class Dashboard extends React.Component {
       });
     };
 
-    const isFulfilledAntReviewOwnedByUser = (antReviewID) => {
-      // find the open ant review with this id,
-      const targetAntReviewArr = antReviews.filter(
-        (antReview) => antReview.antReview_id === antReviewID
-      );
-      if (targetAntReviewArr.length) {
-        return targetAntReviewArr[0].issuer === accounts;
-      }
-      // return false if the issuer of the ant review does not match the current logged in account || if none of the antReviews contain matching ant review ids
-      return false;
-    };
+    // Going to need a different but also stronger filter.
+
+    // const isFulfilledAntReviewOwnedByUser = (antReviewID) => {
+    //   // find the open ant review with this id,
+    //   const targetAntReviewArr = antReviews.filter(
+    //     (antReview) => antReview.antReview_id === antReviewID
+    //   );
+    //   console.log('das', targetAntReviewArr)
+    //   if (targetAntReviewArr.length) {
+    //     return targetAntReviewArr[0].issuer === accounts;
+    //   }
+    //   // return false if the issuer of the ant review does not match the current logged in account || if none of the antReviews contain matching ant review ids
+    //   return false;
+    // };
 
     const displayFulfilledAntReviews = (fulfilledAntReviews) => {
+      // TODO - only display / return fulfillments that are still available (e.g. the (entire?) reward has not been paid out yet)
+
       return fulfilledAntReviews.map((fulfilledAntReview, index) => {
         const { antReview_id: antReviewID } = fulfilledAntReview;
-        if (!isFulfilledAntReviewOwnedByUser(antReviewID)) {
-          const { data: ipfsHash, fulfiller } = fulfilledAntReview;
+        // if (!isFulfilledAntReviewOwnedByUser(antReviewID)) {
+        const {
+          data: ipfsHash,
+          fulfiller,
+          fulfillment_id: fulfillmentID,
+        } = fulfilledAntReview;
 
-          return (
-            <Card
-              key={index}
-              title={ipfsHash}
-              style={{ width: 500, "marginBottom": "2rem" }}
+        return (
+          <Card
+            key={index}
+            title={ipfsHash}
+            style={{ width: 500, marginBottom: "2rem" }}
+          >
+            <p>Peer Reviewer - {fulfiller}</p>
+            <Button
+              onClick={(e) => handleAcceptClick(e, antReviewID, fulfillmentID)}
             >
-              <p>Peer Reviewer - {fulfiller}</p>
-              {/* TODO - Update to handleAcceptClick etc.. */}
-              {/* <Button onClick={(e) => handleFulfillClick(e, antReviewID)}>
-              Fulfill
-            </Button> */}
-            </Card>
-          );
-        }
-        return null;
+              Accept
+            </Button>
+          </Card>
+        );
       });
     };
 
     const displaySkeleton = () => (
-      <Card style={{ width: 500, "marginBottom": "2rem" }}>
+      <Card style={{ width: 500, marginBottom: "2rem" }}>
         <Skeleton active />
       </Card>
     );
 
     const displayMainContent = () => {
+      // display issue ant review modal
+      if (displayIssueAntReviewView) {
+        return (
+          <IssueAntReview
+            antReviewID={clickedAntReviewID}
+            accounts={accounts}
+            web3={web3}
+            antsReviewInstance={antsReviewInstance}
+          />
+        );
+      }
+
       // fulfill antReview has not been clicked
       if (!displayFulfillAntReviewView) {
         return (
