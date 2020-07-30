@@ -10,20 +10,22 @@ import "./index.css";
 
 const AntReviewLayout = () => {
   const [collapsed, setCollapsed] = useState(null);
-  const [displayIssueAntReviewView, setDisplayIssueAntReviewView] = useState(
-    false
-  );
+  const [selectedView, setSelectedView] = useState(null);
 
   const { Header: DesignHeader, Footer, Sider: DesignSider, Content } = Layout;
   const CustomHeart = (props) => <Icon component={HeartOutlined} {...props} />;
 
-  const handleMenuClick = (event) => {
-    console.log("menu click handler stub", event);
+  const handleMenuClick = (selectedTabKey) => {
+    setSelectedView(selectedTabKey);
   };
 
   const handleIssueClick = () => {
-    setDisplayIssueAntReviewView(true);
+    setSelectedView("issueAntReview");
   };
+
+  // const setFulfillView = () => {
+  //   setSelectedView('fulfillAntReview')
+  // }
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -33,11 +35,17 @@ const AntReviewLayout = () => {
         collapsed={collapsed}
         onCollapse={setCollapsed}
       >
-        <Sider handleMenuClick={handleMenuClick} />
+        <Sider
+          currentDisplay={selectedView}
+          handleMenuClick={handleMenuClick}
+        />
       </DesignSider>
       <Layout className="site-layout">
         <DesignHeader className="site-layout-background" style={{ padding: 0 }}>
-          <Header handleIssueClick={handleIssueClick} />
+          <Header
+            currentDisplay={selectedView}
+            handleIssueClick={handleIssueClick}
+          />
         </DesignHeader>
         <Content style={{ margin: "0 16px" }}>
           <div
@@ -50,7 +58,10 @@ const AntReviewLayout = () => {
               justifyContent: "space-around",
             }}
           >
-            <Dashboard displayIssueAntReviewView={displayIssueAntReviewView} />
+            <Dashboard
+              // setFulfillView={setFulfillView}
+              currentDisplay={selectedView}
+            />
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>

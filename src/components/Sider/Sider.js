@@ -3,8 +3,11 @@ import React from "react";
 import { Menu } from "antd";
 import {
   DashboardOutlined,
+  UserOutlined,
+  // UploadOutlined,
   ContainerOutlined,
   EditOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 const { SubMenu } = Menu;
 
@@ -15,12 +18,13 @@ class Sider extends React.Component {
   };
 
   render() {
-    const { handleMenuClick } = this.props;
+    const { handleMenuClick, currentDisplay } = this.props;
 
     return (
       <Menu
         onClick={(e) => this.handleClick(e, handleMenuClick)}
         defaultSelectedKeys={["1"]}
+        selectedKeys={currentDisplay}
         defaultOpenKeys={["sub1"]}
         mode="inline"
       >
@@ -31,6 +35,12 @@ class Sider extends React.Component {
         >
           <Menu.Item icon={<DashboardOutlined />} key="authorDashboard">
             Dashboard
+          </Menu.Item>
+          <Menu.Item icon={<PlusOutlined />} key="issueAntReview">
+            Issue AntReview
+          </Menu.Item>
+          <Menu.Item icon={<UserOutlined />} key="authorProfile">
+            Profile
           </Menu.Item>
         </SubMenu>
         <SubMenu
@@ -46,6 +56,12 @@ class Sider extends React.Component {
         >
           <Menu.Item icon={<DashboardOutlined />} key="peerReviewerDashboard">
             Dashboard
+          </Menu.Item>
+          {/* <Menu.Item icon={<UploadOutlined />} key="fulfillAntReview">
+            Fulfill AntReview
+          </Menu.Item> */}
+          <Menu.Item icon={<UserOutlined />} key="peerReviewerProfile">
+            Profile
           </Menu.Item>
         </SubMenu>
       </Menu>
