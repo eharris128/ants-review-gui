@@ -78,9 +78,10 @@ class Dashboard extends React.Component {
       return mockCards.map((_) => {
         return (
           <Card
-            loading={true}
             style={{ width: 500, "margin-bottom": "2rem" }}
-          ></Card>
+          >
+            <Skeleton active />
+          </Card>
         );
       });
     };
