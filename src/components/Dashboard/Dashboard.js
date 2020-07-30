@@ -23,6 +23,9 @@ class Dashboard extends React.Component {
       // Get network provider and web3 instance.
       const web3 = await getWeb3();
 
+      // Use web3 to get the user's accounts.
+      const accounts = await web3.eth.getAccounts();
+
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = AntsReview.networks[networkId];
@@ -33,7 +36,9 @@ class Dashboard extends React.Component {
 
       // Set contract to the state
       this.setState({
+        web3,
         antsReviewInstance: instance,
+        accounts: accounts.length ? accounts[0] : accounts,
       });
       this.listenAntReviewIssuedEvent(this);
     } catch (error) {
@@ -58,17 +63,24 @@ class Dashboard extends React.Component {
   render() {
     const { Title } = Typography;
 
-    const { antReviews, displayFulfillAntReviewView, clickedAntReviewID } = this.state;
+    const {
+      web3,
+      antsReviewInstance,
+      antReviews,
+      displayFulfillAntReviewView,
+      clickedAntReviewID,
+      accounts,
+    } = this.state;
 
     const setClickedAntReviewID = (antReviewID) => {
       this.setState((prevState) => {
         return {
           ...prevState,
-          clickedAntReviewID: antReviewID
+          clickedAntReviewID: antReviewID,
         };
       });
-    }
-    
+    };
+
     const openFulfillAntReview = () => {
       this.setState((prevState) => {
         return {
@@ -79,7 +91,7 @@ class Dashboard extends React.Component {
     };
 
     const handleFulfillClick = (e, antReviewID) => {
-      setClickedAntReviewID(antReviewID)
+      setClickedAntReviewID(antReviewID);
       openFulfillAntReview();
     };
 
@@ -132,7 +144,14 @@ class Dashboard extends React.Component {
       }
 
       // display fulfill antReview modal
-      return <FulfillAntReview antReviewID={clickedAntReviewID}/>;
+      return (
+        <FulfillAntReview
+          antReviewID={clickedAntReviewID}
+          accounts={accounts}
+          web3={web3}
+          antsReviewInstance={antsReviewInstance}
+        />
+      );
     };
 
     return displayMainContent();

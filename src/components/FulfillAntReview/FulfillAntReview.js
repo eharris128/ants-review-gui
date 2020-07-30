@@ -1,26 +1,17 @@
 import React from "react";
 
-// import { Button } from "antd";
 import FulfillAntReviewForm from "./FulFillAntReviewForm";
 import "./index.css";
 
-const FulfillAntReview = ({ antReviewID }) => {
-  const handleFormSubmit = (fulfilledAntReview) => {
-    console.log("fulfilledAntReview", fulfilledAntReview);
-    console.log("antReviewID to submit with - ", antReviewID)
+const FulfillAntReview = ({ antReviewID, accounts, web3, antsReviewInstance }) => {
+  const handleFormSubmit = async ({ ipfsHash }) => {
+    
+    await antsReviewInstance.methods.fulfillAntReview(antReviewID, ipfsHash).send({from: accounts});
   };
   return (
     <div className="fulfillAntReview">
       <h2>Fulfill AntReview</h2>
-      <FulfillAntReviewForm onSubmit={handleFormSubmit}/>
-      {/* <Button
-          onClick={() => console.log("Start Fulfill AntReview Workflow")}
-          size="large"
-          key="1"
-          type="primary"
-        >
-          Fulfill AntReview
-        </Button> */}
+      <FulfillAntReviewForm onSubmit={handleFormSubmit} />
     </div>
   );
 };
