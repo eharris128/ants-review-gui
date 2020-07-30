@@ -39,8 +39,8 @@ const AntReviewLayout = () => {
               padding: 24,
               minHeight: 360,
               display: "flex",
-              "flex-flow": "row nowrap",
-              "justify-content": "space-around",
+              "flexFlow": "row nowrap",
+              "justifyContent": "space-around",
             }}
           >
             <Dashboard />

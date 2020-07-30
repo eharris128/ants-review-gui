@@ -111,7 +111,7 @@ class Dashboard extends React.Component {
 
     const displayOpenAntReviews = (antReviews) => {
       // TODO (UI or Smart contract?) - only display / return open ant reviews that are 'fulfillable' (e.g. the author of an ant review should not be able to see it under the `Open AntReviews` list)
-      return antReviews.map((antReview) => {
+      return antReviews.map((antReview, index) => {
         // Currently the most recent antReview shows up at the bottom of the list
         const {
           antReview_id: antReviewID,
@@ -120,8 +120,9 @@ class Dashboard extends React.Component {
         } = antReview;
         return (
           <Card
+          key={index}
             title={antReview.data}
-            style={{ width: 500, "margin-bottom": "2rem" }}
+            style={{ width: 500, "marginBottom": "2rem" }}
           >
             <p>Reward - {weiToEth(rewardAmount)} ETH</p>
             <p>Author - {issuer}</p>
@@ -146,15 +147,16 @@ class Dashboard extends React.Component {
     };
 
     const displayFulfilledAntReviews = (fulfilledAntReviews) => {
-      return fulfilledAntReviews.map((fulfilledAntReview) => {
+      return fulfilledAntReviews.map((fulfilledAntReview, index) => {
         const { antReview_id: antReviewID } = fulfilledAntReview;
         if (!isFulfilledAntReviewOwnedByUser(antReviewID)) {
           const { data: ipfsHash, fulfiller } = fulfilledAntReview;
 
           return (
             <Card
+              key={index}
               title={ipfsHash}
-              style={{ width: 500, "margin-bottom": "2rem" }}
+              style={{ width: 500, "marginBottom": "2rem" }}
             >
               <p>Peer Reviewer - {fulfiller}</p>
               {/* TODO - Update to handleAcceptClick etc.. */}
@@ -169,7 +171,7 @@ class Dashboard extends React.Component {
     };
 
     const displaySkeleton = () => (
-      <Card style={{ width: 500, "margin-bottom": "2rem" }}>
+      <Card style={{ width: 500, "marginBottom": "2rem" }}>
         <Skeleton active />
       </Card>
     );
