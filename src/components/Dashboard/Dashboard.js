@@ -167,11 +167,13 @@ class Dashboard extends React.Component {
         } = antReview;
 
         // If the ant review has been cancelled, then do not display it
-        const skipDisplayingAntReview = cancelledAntReviews.find(cancelledReview =>cancelledReview.antReview_id === antReviewID );
+        const skipDisplayingAntReview = cancelledAntReviews.find(
+          (cancelledReview) => cancelledReview.antReview_id === antReviewID
+        );
         if (skipDisplayingAntReview) {
-          return null
+          return null;
         }
-        
+
         const userIsAuthor = accounts === issuer;
         return (
           <Card
@@ -197,27 +199,24 @@ class Dashboard extends React.Component {
       });
     };
 
-    // Going to need a different but also stronger filter.
-
-    // const isFulfilledAntReviewOwnedByUser = (antReviewID) => {
-    //   // find the open ant review with this id,
-    //   const targetAntReviewArr = antReviews.filter(
-    //     (antReview) => antReview.antReview_id === antReviewID
-    //   );
-    //   console.log('das', targetAntReviewArr)
-    //   if (targetAntReviewArr.length) {
-    //     return targetAntReviewArr[0].issuer === accounts;
-    //   }
-    //   // return false if the issuer of the ant review does not match the current logged in account || if none of the antReviews contain matching ant review ids
-    //   return false;
-    // };
-
     const displayFulfilledAntReviews = (fulfilledAntReviews) => {
       // TODO - only display / return fulfillments that are still available (e.g. the (entire?) reward has not been paid out yet)
-
       return fulfilledAntReviews.map((fulfilledAntReview, index) => {
         const { antReview_id: antReviewID } = fulfilledAntReview;
-        // if (!isFulfilledAntReviewOwnedByUser(antReviewID)) {
+
+        // ONLY if the antReviewID of the current fulfillment maps to an antReview in the antReviews state variable where the issuer of that antReview is the current user
+        // THEN we display the card block
+        const isCurrentUsersFulfilledAntReview = (antReviewID) =>
+          antReviews.filter((review) => {
+            const matchingReviewIDs = review.antReview_id === antReviewID;
+            const issuerAndCurrentUserMatch = review.issuer === accounts;
+            return matchingReviewIDs && issuerAndCurrentUserMatch;
+          }).length;
+
+        if (!isCurrentUsersFulfilledAntReview(antReviewID)) {
+          return null;
+        }
+
         const {
           data: ipfsHash,
           fulfiller,
