@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Skeleton, Typography, Card, Button } from "antd";
+import { Skeleton, Typography, Card, Button, Space } from "antd";
 
 import { FulfillAntReview } from "../FulfillAntReview";
 import getWeb3 from "../../utils/getWeb3";
@@ -18,6 +18,7 @@ class Dashboard extends React.Component {
       antReviews: [],
       fulfilledAntReviews: [],
       displayFulfillAntReviewView: false,
+      cancelledAntReviews: [],
     };
   }
   componentDidMount = async () => {
@@ -44,6 +45,7 @@ class Dashboard extends React.Component {
       });
       this.listenAntReviewIssuedEvent(this);
       this.listenAntReviewFulfilledEvent(this);
+      this.listenAntReviewCancelledEvent(this);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -74,10 +76,22 @@ class Dashboard extends React.Component {
       })
       .on("error", console.error);
   };
+
+  listenAntReviewCancelledEvent = (component) => {
+    this.state.antsReviewInstance.events
+      .AntReviewCancelled({ fromBlock: 0 })
+      .on("data", async (event) => {
+        let cancelledAntReviewArray = component.state.cancelledAntReviews.slice();
+        cancelledAntReviewArray.push(event.returnValues);
+        component.setState({ cancelledAntReviews: cancelledAntReviewArray });
+      })
+      .on("error", console.error);
+  };
+
   render() {
     const { Title } = Typography;
     const { displayIssueAntReviewView } = this.props;
-    
+
     const {
       web3,
       antsReviewInstance,
@@ -86,7 +100,17 @@ class Dashboard extends React.Component {
       clickedAntReviewID,
       accounts,
       fulfilledAntReviews,
+      cancelledAntReviews,
     } = this.state;
+    // console.log('new phone who dis', cancelledAntReviews)
+
+    // an ant review can only be displayed if it has not yet been cancelled
+
+    // fulfill workflow
+    const handleFulfillClick = (e, antReviewID) => {
+      setClickedAntReviewID(antReviewID);
+      openFulfillAntReview();
+    };
 
     const setClickedAntReviewID = (antReviewID) => {
       this.setState((prevState) => {
@@ -106,12 +130,20 @@ class Dashboard extends React.Component {
       });
     };
 
-    const handleFulfillClick = (e, antReviewID) => {
-      setClickedAntReviewID(antReviewID);
-      openFulfillAntReview();
+    // cancel workflow
+    const handleCancelClick = (e, antReviewID) => {
+      // Later, add a 'Are you sure you want to cancel' modal, etc...
+      cancelAntReview(antReviewID);
     };
 
-    const acceptAndReview = async (antReviewID, fulfillmentID) => {
+    const cancelAntReview = async (antReviewID) => {
+      await antsReviewInstance.methods
+        .cancelAntReview(antReviewID)
+        .send({ from: accounts });
+    };
+
+    // accept workflow
+    const acceptAntReview = async (antReviewID, fulfillmentID) => {
       await antsReviewInstance.methods
         .acceptFulfillment(antReviewID, fulfillmentID)
         .send({ from: accounts });
@@ -120,12 +152,12 @@ class Dashboard extends React.Component {
     const handleAcceptClick = (e, antReviewID, fulfillmentID) => {
       // Later, when a view likely pops up to confirm details prior to approval
       // this may be the best point of extension
-      acceptAndReview(antReviewID, fulfillmentID);
+      acceptAntReview(antReviewID, fulfillmentID);
     };
 
     const displayOpenAntReviews = (antReviews) => {
-      // TODO (UI) - only display / return open ant reviews that are 'fulfillable' (e.g. the author of an ant review should not be able to see it under the `Open AntReviews` list)
-      // Also, not expired
+      // TODO  - only display / return open ant reviews that are 'fulfillable' (e.g. the author of an ant review should not be able to see it under the `Open AntReviews` list)
+      // Also, not expired (cannot currently do this with the contract design)
       return antReviews.map((antReview, index) => {
         // Currently the most recent antReview shows up at the bottom of the list
         const {
@@ -133,6 +165,14 @@ class Dashboard extends React.Component {
           amount: rewardAmount,
           issuer,
         } = antReview;
+
+        // If the ant review has been cancelled, then do not display it
+        const skipDisplayingAntReview = cancelledAntReviews.find(cancelledReview =>cancelledReview.antReview_id === antReviewID );
+        if (skipDisplayingAntReview) {
+          return null
+        }
+        
+        const userIsAuthor = accounts === issuer;
         return (
           <Card
             key={index}
@@ -141,9 +181,17 @@ class Dashboard extends React.Component {
           >
             <p>Reward - {weiToEth(rewardAmount)} ETH</p>
             <p>Author - {issuer}</p>
-            <Button onClick={(e) => handleFulfillClick(e, antReviewID)}>
-              Fulfill
-            </Button>
+            <Space>
+              <Button onClick={(e) => handleFulfillClick(e, antReviewID)}>
+                Fulfill
+              </Button>
+              {/* only the author of an antreview can cancel it */}
+              {userIsAuthor ? (
+                <Button onClick={(e) => handleCancelClick(e, antReviewID)}>
+                  Cancel
+                </Button>
+              ) : null}
+            </Space>
           </Card>
         );
       });

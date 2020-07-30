@@ -24,6 +24,7 @@ const AntReviewLayout = () => {
   const handleIssueClick = () => {
     setDisplayIssueAntReviewView(true);
   };
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <DesignSider
