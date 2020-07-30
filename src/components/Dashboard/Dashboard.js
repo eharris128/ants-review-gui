@@ -15,6 +15,7 @@ class Dashboard extends React.Component {
       web3: null,
       antsReviewInstance: null,
       antReviews: [],
+      fulfilledAntReviews: [],
       displayFulfillAntReviewView: false,
     };
   }
@@ -41,6 +42,7 @@ class Dashboard extends React.Component {
         accounts: accounts.length ? accounts[0] : accounts,
       });
       this.listenAntReviewIssuedEvent(this);
+      this.listenAntReviewFulfilledEvent(this);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -60,6 +62,17 @@ class Dashboard extends React.Component {
       })
       .on("error", console.error);
   };
+
+  listenAntReviewFulfilledEvent = (component) => {
+    this.state.antsReviewInstance.events
+      .AntReviewFulfilled({ fromBlock: 0 })
+      .on("data", async (event) => {
+        let fulfilledAntReviewArray = component.state.fulfilledAntReviews.slice();
+        fulfilledAntReviewArray.push(event.returnValues);
+        component.setState({ fulfilledAntReviews: fulfilledAntReviewArray });
+      })
+      .on("error", console.error);
+  };
   render() {
     const { Title } = Typography;
 
@@ -70,6 +83,7 @@ class Dashboard extends React.Component {
       displayFulfillAntReviewView,
       clickedAntReviewID,
       accounts,
+      fulfilledAntReviews,
     } = this.state;
 
     const setClickedAntReviewID = (antReviewID) => {
@@ -95,7 +109,8 @@ class Dashboard extends React.Component {
       openFulfillAntReview();
     };
 
-    const displayAntReviews = (antReviews) => {
+    const displayOpenAntReviews = (antReviews) => {
+      // TODO (UI or Smart contract?) - only display / return open ant reviews that are 'fulfillable' (e.g. the author of an ant review should not be able to see it under the `Open AntReviews` list)
       return antReviews.map((antReview) => {
         // Currently the most recent antReview shows up at the bottom of the list
         const {
@@ -118,27 +133,64 @@ class Dashboard extends React.Component {
       });
     };
 
-    const displaySkeleton = () => {
-      // To be removed as soon as possible...
-      const mockCards = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-      return mockCards.map((_) => {
-        return (
-          <Card style={{ width: 500, "margin-bottom": "2rem" }}>
-            <Skeleton active />
-          </Card>
-        );
+    const isFulfilledAntReviewOwnedByUser = (antReviewID) => {
+      // find the open ant review with this id,
+      const targetAntReviewArr = antReviews.filter(
+        (antReview) => antReview.antReview_id === antReviewID
+      );
+      if (targetAntReviewArr.length) {
+        return targetAntReviewArr[0].issuer === accounts;
+      }
+      // return false if the issuer of the ant review does not match the current logged in account || if none of the antReviews contain matching ant review ids
+      return false;
+    };
+
+    const displayFulfilledAntReviews = (fulfilledAntReviews) => {
+      return fulfilledAntReviews.map((fulfilledAntReview) => {
+        const { antReview_id: antReviewID } = fulfilledAntReview;
+        if (!isFulfilledAntReviewOwnedByUser(antReviewID)) {
+          const { data: ipfsHash, fulfiller } = fulfilledAntReview;
+
+          return (
+            <Card
+              title={ipfsHash}
+              style={{ width: 500, "margin-bottom": "2rem" }}
+            >
+              <p>Peer Reviewer - {fulfiller}</p>
+              {/* TODO - Update to handleAcceptClick etc.. */}
+              {/* <Button onClick={(e) => handleFulfillClick(e, antReviewID)}>
+              Fulfill
+            </Button> */}
+            </Card>
+          );
+        }
+        return null;
       });
     };
+
+    const displaySkeleton = () => (
+      <Card style={{ width: 500, "margin-bottom": "2rem" }}>
+        <Skeleton active />
+      </Card>
+    );
 
     const displayMainContent = () => {
       // fulfill antReview has not been clicked
       if (!displayFulfillAntReviewView) {
         return (
           <>
-            <Title level={2}>Open AntReviews</Title>
-            {antReviews.length
-              ? displayAntReviews(antReviews)
-              : displaySkeleton()}
+            <div>
+              <Title level={2}>Open AntReviews</Title>
+              {antReviews.length
+                ? displayOpenAntReviews(antReviews)
+                : displaySkeleton()}
+            </div>
+            <div>
+              <Title level={2}>Fulfilled AntReviews</Title>
+              {fulfilledAntReviews.length
+                ? displayFulfilledAntReviews(fulfilledAntReviews)
+                : displaySkeleton()}
+            </div>
           </>
         );
       }

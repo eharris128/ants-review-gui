@@ -14,7 +14,9 @@ const AntReviewLayout = () => {
   const { Header: DesignHeader, Footer, Sider: DesignSider, Content } = Layout;
   const CustomHeart = (props) => <Icon component={HeartOutlined} {...props} />;
 
-  const handleMenuClick = (event) => { console.log('menu click handler stub', event)};
+  const handleMenuClick = (event) => {
+    console.log("menu click handler stub", event);
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -33,7 +35,13 @@ const AntReviewLayout = () => {
         <Content style={{ margin: "0 16px" }}>
           <div
             className="site-layout-background"
-            style={{ padding: 24, minHeight: 360 }}
+            style={{
+              padding: 24,
+              minHeight: 360,
+              display: "flex",
+              "flex-flow": "row nowrap",
+              "justify-content": "space-around",
+            }}
           >
             <Dashboard />
           </div>
