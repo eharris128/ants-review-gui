@@ -7,8 +7,8 @@ import getWeb3 from "../../utils/getWeb3";
 import AntsReview from "../../contracts/AntsReview.json";
 import weiToEth from "../../utils/weiToEth";
 import IssueAntReview from "../IssueAntReview/IssueAntReview";
-import { PeerReviewerProfile } from "../PeerReviewerProfile"
-import { AuthorProfile } from "../AuthorProfile"
+import { PeerReviewerProfile } from "../PeerReviewerProfile";
+import { AuthorProfile } from "../AuthorProfile";
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -106,7 +106,7 @@ class Dashboard extends React.Component {
   render() {
     const { Title } = Typography;
     const { currentDisplay } = this.props;
-    console.log('Dashboard - currentDisplay', currentDisplay)
+    console.log("Dashboard - currentDisplay", currentDisplay);
 
     const {
       web3,
@@ -270,17 +270,21 @@ class Dashboard extends React.Component {
     );
 
     const displayMainContent = () => {
-
       // Display management
       // Warning - modification of the Sider menu item key names will need to be coupled with changes to the relevant display control below.
       if (currentDisplay === "peerReviewerProfile") {
-        return <PeerReviewerProfile />
+        return (
+          <PeerReviewerProfile
+            acceptedAntReviews={acceptedAntReviews}
+            accounts={accounts}
+          />
+        );
       }
-      
-      if (currentDisplay === 'authorProfile') {
-        return <AuthorProfile />
+
+      if (currentDisplay === "authorProfile") {
+        return <AuthorProfile />;
       }
-      
+
       if (currentDisplay === "issueAntReview") {
         return (
           <IssueAntReview
