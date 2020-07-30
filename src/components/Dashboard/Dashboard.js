@@ -2,6 +2,7 @@ import React from "react";
 
 import { Skeleton, Typography, Card, Button } from "antd";
 
+import { FulfillAntReview } from "../FulfillAntReview";
 import getWeb3 from "../../utils/getWeb3";
 import AntsReview from "../../contracts/AntsReview.json";
 import weiToEth from "../../utils/weiToEth";
@@ -14,6 +15,7 @@ class Dashboard extends React.Component {
       web3: null,
       antsReviewInstance: null,
       antReviews: [],
+      displayFulfillAntReviewView: false,
     };
   }
   componentDidMount = async () => {
@@ -56,41 +58,84 @@ class Dashboard extends React.Component {
   render() {
     const { Title } = Typography;
 
-    const { antReviews } = this.state;
+    const { antReviews, displayFulfillAntReviewView, clickedAntReviewID } = this.state;
+
+    const setClickedAntReviewID = (antReviewID) => {
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          clickedAntReviewID: antReviewID
+        };
+      });
+    }
+    
+    const openFulfillAntReview = () => {
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          displayFulfillAntReviewView: true,
+        };
+      });
+    };
+
+    const handleFulfillClick = (e, antReviewID) => {
+      setClickedAntReviewID(antReviewID)
+      openFulfillAntReview();
+    };
 
     const displayAntReviews = (antReviews) => {
       return antReviews.map((antReview) => {
+        // Currently the most recent antReview shows up at the bottom of the list
+        const {
+          antReview_id: antReviewID,
+          amount: rewardAmount,
+          issuer,
+        } = antReview;
         return (
           <Card
             title={antReview.data}
             style={{ width: 500, "margin-bottom": "2rem" }}
           >
-            <p>Reward - {weiToEth(antReview.amount)} ETH</p>
-            <p>Author - {antReview.issuer}</p>
-            <Button>Fulfill</Button>
+            <p>Reward - {weiToEth(rewardAmount)} ETH</p>
+            <p>Author - {issuer}</p>
+            <Button onClick={(e) => handleFulfillClick(e, antReviewID)}>
+              Fulfill
+            </Button>
           </Card>
         );
       });
     };
+
     const displaySkeleton = () => {
       // To be removed as soon as possible...
       const mockCards = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
       return mockCards.map((_) => {
         return (
-          <Card
-            style={{ width: 500, "margin-bottom": "2rem" }}
-          >
+          <Card style={{ width: 500, "margin-bottom": "2rem" }}>
             <Skeleton active />
           </Card>
         );
       });
     };
-    return (
-      <>
-        <Title level={2}>Open AntReviews</Title>
-        {antReviews.length ? displayAntReviews(antReviews) : displaySkeleton()}
-      </>
-    );
+
+    const displayMainContent = () => {
+      // fulfill antReview has not been clicked
+      if (!displayFulfillAntReviewView) {
+        return (
+          <>
+            <Title level={2}>Open AntReviews</Title>
+            {antReviews.length
+              ? displayAntReviews(antReviews)
+              : displaySkeleton()}
+          </>
+        );
+      }
+
+      // display fulfill antReview modal
+      return <FulfillAntReview antReviewID={clickedAntReviewID}/>;
+    };
+
+    return displayMainContent();
   }
 }
 

@@ -2,8 +2,7 @@ import React from "react";
 import { Form, Input, Tooltip, Button } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 
-const FulfillAntReviewForm = (props) => {
-  const { onSubmit } = props;
+const FulfillAntReviewForm = ({ onSubmit, antReviewID }) => {
   const [form] = Form.useForm();
 
   const layout = {

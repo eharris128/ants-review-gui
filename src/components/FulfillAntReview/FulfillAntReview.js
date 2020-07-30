@@ -4,14 +4,15 @@ import React from "react";
 import FulfillAntReviewForm from "./FulFillAntReviewForm";
 import "./index.css";
 
-const FulfillAntReview = () => {
+const FulfillAntReview = ({ antReviewID }) => {
   const handleFormSubmit = (fulfilledAntReview) => {
     console.log("fulfilledAntReview", fulfilledAntReview);
+    console.log("antReviewID to submit with - ", antReviewID)
   };
   return (
     <div className="fulfillAntReview">
       <h2>Fulfill AntReview</h2>
-      <FulfillAntReviewForm onSubmit={handleFormSubmit} />
+      <FulfillAntReviewForm onSubmit={handleFormSubmit}/>
       {/* <Button
           onClick={() => console.log("Start Fulfill AntReview Workflow")}
           size="large"
