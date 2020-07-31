@@ -1,15 +1,27 @@
 import React from "react";
-import { Form, Input, Tooltip, Button } from "antd";
+import { Form, Input, Tooltip, Button, Select } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
+const { Option } = Select;
+
+const displayAntReviewOptions = (fulfillableAntReviews) => {
+  return fulfillableAntReviews.map((fulfillableAntReview, index) => {
+    const { data: paperHash, antReview_id: antReviewID } = fulfillableAntReview;
+    const hashWithID = `${paperHash}_${antReviewID}`;
+    return (
+      <Option key={index} value={hashWithID}>
+        {paperHash}
+      </Option>
+    );
+  });
+};
 
 const FulfillAntReviewForm = ({
   onSubmit,
   antReviewID,
   promptForAntReview,
+  fulfillableAntReviews,
 }) => {
-  console.log('promptForAntReview', promptForAntReview)
   const [form] = Form.useForm();
-
   const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
@@ -19,10 +31,12 @@ const FulfillAntReviewForm = ({
   };
 
   const onFinish = (values) => {
-    const { ipfsHash } = values;
+    const { ipfsHash, antReview } = values;
 
+    const targetAntReviewID = antReview.split("_")[1];
     const submitPayload = {
       ipfsHash,
+      antReview: targetAntReviewID,
     };
     onSubmit(submitPayload);
   };
@@ -30,6 +44,7 @@ const FulfillAntReviewForm = ({
   const onFill = () => {
     form.setFieldsValue({
       ipfsHash: "QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t",
+      antReview: "QmZZQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t_17",
     });
   };
 
@@ -43,18 +58,14 @@ const FulfillAntReviewForm = ({
         onFinish={onFinish}
       >
         {!promptForAntReview ? null : (
-          // Stub
-          <Form.Item label="Ant Review" name="antReview">
-            <Input
-              placeholder="QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t"
-              suffix={
-                <Tooltip title="The hash of the reviewed paper.">
-                  <InfoCircleOutlined style={{ color: "rgba(0,0,0,.45)" }} />
-                </Tooltip>
-              }
-            />
+          <Form.Item label="AntReview" name="antReview">
+            <Select
+              placeholder="Select the hash of the original paper you reviewed"
+              style={{ width: 450 }}
+            >
+              {displayAntReviewOptions(fulfillableAntReviews)}
+            </Select>
           </Form.Item>
-          // End Stub
         )}
         <Form.Item
           label="IPFS Hash"
