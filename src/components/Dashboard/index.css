@@ -1,6 +1,13 @@
 .peerReviewDashboardContainer {
-    display: flex;
-    width: 80%;
-    flex-flow: row nowrap;
-    justify-content: space-around;
+  display: flex;
+  width: 80%;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+}
+
+.authorDashboardContainer {
+  display: flex;
+  width: 80%;
+  flex-flow: row nowrap;
+  justify-content: space-around;
 }

@@ -184,6 +184,7 @@ class Dashboard extends React.Component {
         } = antReview;
 
         // If the ant review has been cancelled, then do not display it
+        // TODO - this filter logic likely needs to be at a higher level to improve the quality of other views of the ant reviews
         const skipDisplayingAntReview = cancelledAntReviews.find(
           (cancelledReview) => cancelledReview.antReview_id === antReviewID
         );
@@ -294,14 +295,59 @@ class Dashboard extends React.Component {
         return (
           <Card key={index} title={peerReviewHash}>
             {/* TODO - Link to Details View */}
-            <Button
-              disabled={true}
-            >
-              View AntReview Details
-            </Button>
+            <Button disabled={true}>View AntReview Details</Button>
           </Card>
         );
       });
+    };
+
+    const displayMyUnreviewedReviews = (
+      antReviews,
+      fulfilledAntReviews,
+      account
+    ) => {
+      // TODO - filter out 'completed' antreviews + 'canceled' antreviews.
+      
+      // Filter antReviews such that I only have ones where i am the issuer
+      const isUserAntReviewAuthor = (antReviews, account) => {
+        return antReviews.filter(({ issuer }) => {
+          return issuer === account;
+        });
+      };
+      const myAntReviews = isUserAntReviewAuthor(antReviews, account);
+      // Filter the ^ subset by searching for reviews that have 0 fulfillments against them.
+      const myUnfilfilledAntReviews = myAntReviews.filter(
+        ({ antReview_id: myAntReviewID }) => {
+          return fulfilledAntReviews.some(
+            ({ antReview_id: fulfilledAntReviewID }) => {
+              return fulfilledAntReviewID === myAntReviewID;
+            }
+          );
+        }
+      );
+
+      return myUnfilfilledAntReviews.map(
+        (
+          unfilledAntReview,
+          index
+        ) => {
+          const { antReview_id: antReviewID, data: paperHash, amount: rewardAmount } = unfilledAntReview
+          return (
+            <Space>
+              <Card key={index} title={paperHash}>
+                <p>Reward - {weiToEth(rewardAmount)} ETH</p>
+                <Button onClick={(e) => handleCancelClick(e, antReviewID)}>
+                  Cancel
+                </Button>
+                {/* TODO - Link to Edit View */}
+                <Button disabled={true}>Edit AntReview</Button>
+                {/* TODO - Link to Details View */}
+                <Button disabled={true}>View AntReview Details</Button>
+              </Card>
+            </Space>
+          );
+        }
+      );
     };
 
     const displaySkeleton = () => (
@@ -353,6 +399,40 @@ class Dashboard extends React.Component {
         );
       }
 
+      if (currentDisplay === "authorDashboard") {
+        const myCompletedReviews = isUserFulfiller(
+          acceptedAntReviews,
+          accounts
+        );
+
+        return (
+          <>
+            <div className="authorDashboardContainer">
+              <div>
+                <Title level={2}>AntReviews Awaiting Reviewers</Title>
+                {antReviews.length
+                  ? displayMyUnreviewedReviews(
+                      antReviews,
+                      fulfilledAntReviews,
+                      accounts
+                    )
+                  : displaySkeleton()}
+              </div>
+              <div>
+                {/* Completed Reviews == fulfilled && paid out reviews */}
+                <Title level={2}>Peer Reviewers Awaiting Payout</Title>
+                {/* {myCompletedReviews.length
+                  ? displayUnpaidReviews(
+                      myCompletedReviews,
+                      acceptedAntReviews,
+                      accounts
+                    )
+                  : displaySkeleton()} */}
+              </div>
+            </div>
+          </>
+        );
+      }
       if (currentDisplay === "authorProfile") {
         return <AuthorProfile />;
       }
