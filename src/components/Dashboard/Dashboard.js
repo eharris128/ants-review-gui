@@ -10,6 +10,7 @@ import weiToEth from "../../utils/weiToEth";
 import IssueAntReview from "../IssueAntReview/IssueAntReview";
 import { PeerReviewerProfile } from "../PeerReviewerProfile";
 import { AuthorProfile } from "../AuthorProfile";
+import { AntReviewDetailView } from "../AntReviewDetailView";
 
 import "./index.css";
 class Dashboard extends React.Component {
@@ -24,6 +25,7 @@ class Dashboard extends React.Component {
       displayFulfillAntReviewView: false,
       cancelledAntReviews: [],
       acceptedAntReviews: [],
+      selectedAntReviewDetails: null,
     };
   }
   componentDidMount = async () => {
@@ -127,8 +129,8 @@ class Dashboard extends React.Component {
 
   render() {
     const { Title, Paragraph } = Typography;
-    const { currentDisplay, setFulfillView } = this.props;
-    
+    const { currentDisplay, setFulfillView, setAntReviewDetailsView } = this.props;
+
     const {
       web3,
       antsReviewInstance,
@@ -138,6 +140,7 @@ class Dashboard extends React.Component {
       fulfilledAntReviews,
       cancelledAntReviews,
       acceptedAntReviews,
+      selectedAntReviewDetails,
     } = this.state;
 
     // fulfill workflow
@@ -151,6 +154,17 @@ class Dashboard extends React.Component {
         return {
           ...prevState,
           clickedAntReviewID: antReviewID,
+        };
+      });
+    };
+
+    // details workflow
+    const handleAntReviewDetailsClick = (e, antReview) => {
+      setAntReviewDetailsView();
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          selectedAntReviewDetails: antReview,
         };
       });
     };
@@ -220,6 +234,9 @@ class Dashboard extends React.Component {
                   Cancel
                 </Button>
               ) : null}
+              <Button onClick={(e) => handleAntReviewDetailsClick(e, antReview)}>
+                View AntReview Details
+              </Button>
             </Space>
           </Card>
         );
@@ -303,8 +320,8 @@ class Dashboard extends React.Component {
           const { data: peerReviewHash } = unpaidFulfillment;
           return (
             <Card key={index} title={peerReviewHash}>
-              {/* TODO - Link to Details View */}
-              <Button disabled={true}>View AntReview Details</Button>
+              {/* TODO - Link to FulfillmentDetails View */}
+              <Button disabled={true}>View Fulfillment Details</Button>
             </Card>
           );
         })
@@ -333,8 +350,8 @@ class Dashboard extends React.Component {
             <Space>
               {/* TODO - Link to Edit View */}
               <Button disabled={true}>Edit AntReview</Button>
-              {/* TODO - Link to Details View */}
-              <Button disabled={true}>View AntReview Details</Button>
+              {/* TODO - Link to Fulfillment(or AntReview?) Details View */}
+              <Button disabled={true}>View Fulfillment Details</Button>
               <Button
                 onClick={(e) =>
                   handleAcceptClick(e, antReviewID, fulfillmentID)
@@ -375,18 +392,19 @@ class Dashboard extends React.Component {
           amount: rewardAmount,
         } = unfilledAntReview;
         return (
-          <Space>
-            <Card key={index} title={paperHash}>
-              <p>Reward - {weiToEth(rewardAmount)} ETH</p>
+          <Card key={index} title={paperHash}>
+            <p>Reward - {weiToEth(rewardAmount)} ETH</p>
+            <Space>
               <Button onClick={(e) => handleCancelClick(e, antReviewID)}>
                 Cancel
               </Button>
               {/* TODO - Link to Edit View */}
               <Button disabled={true}>Edit AntReview</Button>
-              {/* TODO - Link to Details View */}
-              <Button disabled={true}>View AntReview Details</Button>
-            </Card>
-          </Space>
+              <Button onClick={(e) => handleAntReviewDetailsClick(e, unfilledAntReview)}>
+                View AntReview Details
+              </Button>
+            </Space>
+          </Card>
         );
       });
     };
@@ -509,6 +527,10 @@ class Dashboard extends React.Component {
             antsReviewInstance={antsReviewInstance}
           />
         );
+      }
+
+      if (currentDisplay === "details") {
+        return <AntReviewDetailView antReview={selectedAntReviewDetails} />;
       }
 
       return (

@@ -87,6 +87,7 @@ const AntReviewForm = (props) => {
             disabledDate={(current) =>
               current && current.valueOf() < Date.now()
             }
+            style={{ width: "10rem" }}
             placeholder="Select Due Date"
           />
         </Form.Item>
