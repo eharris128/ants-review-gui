@@ -11,6 +11,7 @@ import IssueAntReview from "../IssueAntReview/IssueAntReview";
 import { PeerReviewerProfile } from "../PeerReviewerProfile";
 import { AuthorProfile } from "../AuthorProfile";
 import { AntReviewDetailView } from "../AntReviewDetailView";
+import { FulfillmentDetails } from "../FulfillmentDetails";
 
 import "./index.css";
 class Dashboard extends React.Component {
@@ -26,6 +27,7 @@ class Dashboard extends React.Component {
       cancelledAntReviews: [],
       acceptedAntReviews: [],
       selectedAntReviewDetails: null,
+      selectedFulfillmentDetails: null,
     };
   }
   componentDidMount = async () => {
@@ -129,7 +131,12 @@ class Dashboard extends React.Component {
 
   render() {
     const { Title, Paragraph } = Typography;
-    const { currentDisplay, setFulfillView, setAntReviewDetailsView } = this.props;
+    const {
+      currentDisplay,
+      setFulfillView,
+      setAntReviewDetailsView,
+      setFulfillmentDetailsView,
+    } = this.props;
 
     const {
       web3,
@@ -141,6 +148,7 @@ class Dashboard extends React.Component {
       cancelledAntReviews,
       acceptedAntReviews,
       selectedAntReviewDetails,
+      selectedFulfillmentDetails,
     } = this.state;
 
     // fulfill workflow
@@ -158,13 +166,24 @@ class Dashboard extends React.Component {
       });
     };
 
-    // details workflow
+    // antReview details workflow
     const handleAntReviewDetailsClick = (e, antReview) => {
       setAntReviewDetailsView();
       this.setState((prevState) => {
         return {
           ...prevState,
           selectedAntReviewDetails: antReview,
+        };
+      });
+    };
+
+    // fulfillment details workflow
+    const handleFulfillmentDetailsClick = (e, fulfillment) => {
+      setFulfillmentDetailsView();
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          selectedFulfillmentDetails: fulfillment,
         };
       });
     };
@@ -234,7 +253,9 @@ class Dashboard extends React.Component {
                   Cancel
                 </Button>
               ) : null}
-              <Button onClick={(e) => handleAntReviewDetailsClick(e, antReview)}>
+              <Button
+                onClick={(e) => handleAntReviewDetailsClick(e, antReview)}
+              >
                 View AntReview Details
               </Button>
             </Space>
@@ -319,9 +340,18 @@ class Dashboard extends React.Component {
         myUnpaidFulfillments.map((unpaidFulfillment, index) => {
           const { data: peerReviewHash } = unpaidFulfillment;
           return (
-            <Card key={index} title={peerReviewHash}>
-              {/* TODO - Link to FulfillmentDetails View */}
-              <Button disabled={true}>View Fulfillment Details</Button>
+            <Card
+              key={index}
+              title={peerReviewHash}
+              style={{ marginBottom: "2rem" }}
+            >
+              <Button
+                onClick={(e) =>
+                  handleFulfillmentDetailsClick(e, unpaidFulfillment)
+                }
+              >
+                View Fulfillment Details
+              </Button>
             </Card>
           );
         })
@@ -350,8 +380,14 @@ class Dashboard extends React.Component {
             <Space>
               {/* TODO - Link to Edit View */}
               <Button disabled={true}>Edit AntReview</Button>
-              {/* TODO - Link to Fulfillment(or AntReview?) Details View */}
-              <Button disabled={true}>View Fulfillment Details</Button>
+              <Button
+                onClick={(e) =>
+                  handleFulfillmentDetailsClick(e, unpaidReviewer)
+                }
+              >
+                View Fulfillment Details
+              </Button>
+
               <Button
                 onClick={(e) =>
                   handleAcceptClick(e, antReviewID, fulfillmentID)
@@ -400,7 +436,11 @@ class Dashboard extends React.Component {
               </Button>
               {/* TODO - Link to Edit View */}
               <Button disabled={true}>Edit AntReview</Button>
-              <Button onClick={(e) => handleAntReviewDetailsClick(e, unfilledAntReview)}>
+              <Button
+                onClick={(e) =>
+                  handleAntReviewDetailsClick(e, unfilledAntReview)
+                }
+              >
                 View AntReview Details
               </Button>
             </Space>
@@ -531,6 +571,10 @@ class Dashboard extends React.Component {
 
       if (currentDisplay === "antReviewDetails") {
         return <AntReviewDetailView antReview={selectedAntReviewDetails} />;
+      }
+
+      if (currentDisplay === "fulfillmentDetails") {
+        return <FulfillmentDetails fulfillment={selectedFulfillmentDetails} />;
       }
 
       return (
