@@ -106,7 +106,7 @@ class Dashboard extends React.Component {
   };
 
   render() {
-    const { Title } = Typography;
+    const { Title, Paragraph } = Typography;
     const { currentDisplay } = this.props;
     console.log("Dashboard - currentDisplay", currentDisplay);
 
@@ -287,34 +287,67 @@ class Dashboard extends React.Component {
           return fulfillmentIsUnpaid();
         }
       );
+      return myUnpaidFulfillments.length ? (
+        // Do we want to display the unpaid fulfillment or the coupled ant review?
+        // Could link to the ant review detail view from the fulfillment?
+          myUnpaidFulfillments.map((unpaidFulfillment, index) => {
+          const { data: peerReviewHash } = unpaidFulfillment;
+          return (
+            <Card key={index} title={peerReviewHash}>
+              {/* TODO - Link to Details View */}
+              <Button disabled={true}>View AntReview Details</Button>
+            </Card>
+          )
+        })
+      ) : (
+        <div>0 reviews currently awaiting payment.</div>
+      )
+    };
 
-      // Do we want to display the unpaid fulfillment or the coupled ant review?
-      // Could link to the ant review detail view from the fulfillment?
-      return myUnpaidFulfillments.map((unpaidFulfillment, index) => {
-        const { data: peerReviewHash } = unpaidFulfillment;
+    const displayUnpaidReviewers = (myAntReviews, fulfilledAntReviews) => {
+      const unpaidReviewers = fulfilledAntReviews.filter((fulfillment) => {
+        return myAntReviews.some(
+          ({ antReview_id: myAntReviewID }) =>
+            fulfillment.antReview_id === myAntReviewID
+        );
+      });
+      return unpaidReviewers.map((unpaidReviewer, index) => {
+        const {
+          fulfiller,
+          fulfillment_id: fulfillmentID,
+          data: reviewHash,
+          antReview_id: antReviewID,
+        } = unpaidReviewer;
         return (
-          <Card key={index} title={peerReviewHash}>
-            {/* TODO - Link to Details View */}
-            <Button disabled={true}>View AntReview Details</Button>
+          <Card key={index} title={reviewHash}>
+            <Paragraph> Peer Reviewer - {fulfiller}</Paragraph>
+            <Space>
+              {/* TODO - Link to Edit View */}
+              <Button disabled={true}>Edit AntReview</Button>
+              {/* TODO - Link to Details View */}
+              <Button disabled={true}>View AntReview Details</Button>
+              <Button
+                onClick={(e) =>
+                  handleAcceptClick(e, antReviewID, fulfillmentID)
+                }
+              >
+                Accept
+              </Button>
+            </Space>
           </Card>
         );
       });
     };
 
     const displayMyUnreviewedReviews = (
-      antReviews,
+      myAntReviews,
       fulfilledAntReviews,
       account
     ) => {
       // TODO - filter out 'completed' antreviews + 'canceled' antreviews.
-      
+
       // Filter antReviews such that I only have ones where i am the issuer
-      const isUserAntReviewAuthor = (antReviews, account) => {
-        return antReviews.filter(({ issuer }) => {
-          return issuer === account;
-        });
-      };
-      const myAntReviews = isUserAntReviewAuthor(antReviews, account);
+
       // Filter the ^ subset by searching for reviews that have 0 fulfillments against them.
       const myUnfilfilledAntReviews = myAntReviews.filter(
         ({ antReview_id: myAntReviewID }) => {
@@ -326,28 +359,27 @@ class Dashboard extends React.Component {
         }
       );
 
-      return myUnfilfilledAntReviews.map(
-        (
-          unfilledAntReview,
-          index
-        ) => {
-          const { antReview_id: antReviewID, data: paperHash, amount: rewardAmount } = unfilledAntReview
-          return (
-            <Space>
-              <Card key={index} title={paperHash}>
-                <p>Reward - {weiToEth(rewardAmount)} ETH</p>
-                <Button onClick={(e) => handleCancelClick(e, antReviewID)}>
-                  Cancel
-                </Button>
-                {/* TODO - Link to Edit View */}
-                <Button disabled={true}>Edit AntReview</Button>
-                {/* TODO - Link to Details View */}
-                <Button disabled={true}>View AntReview Details</Button>
-              </Card>
-            </Space>
-          );
-        }
-      );
+      return myUnfilfilledAntReviews.map((unfilledAntReview, index) => {
+        const {
+          antReview_id: antReviewID,
+          data: paperHash,
+          amount: rewardAmount,
+        } = unfilledAntReview;
+        return (
+          <Space>
+            <Card key={index} title={paperHash}>
+              <p>Reward - {weiToEth(rewardAmount)} ETH</p>
+              <Button onClick={(e) => handleCancelClick(e, antReviewID)}>
+                Cancel
+              </Button>
+              {/* TODO - Link to Edit View */}
+              <Button disabled={true}>Edit AntReview</Button>
+              {/* TODO - Link to Details View */}
+              <Button disabled={true}>View AntReview Details</Button>
+            </Card>
+          </Space>
+        );
+      });
     };
 
     const displaySkeleton = () => (
@@ -365,28 +397,41 @@ class Dashboard extends React.Component {
           accounts
         );
 
+        // fulfill antReview has not been clicked
+        if (!displayFulfillAntReviewView) {
+          return (
+            <>
+              <div className="peerReviewDashboardContainer">
+                <div>
+                  <Title level={2}>Open AntReviews</Title>
+                  {antReviews.length
+                    ? displayOpenAntReviews(antReviews)
+                    : displaySkeleton()}
+                </div>
+                <div>
+                  {/* Completed Reviews == fulfilled && paid out reviews */}
+                  <Title level={2}>My Reviews Awaiting Payment</Title>
+                  {myCompletedReviews.length
+                    ? displayUnpaidReviews(
+                        myCompletedReviews,
+                        acceptedAntReviews,
+                        accounts
+                      )
+                    : displaySkeleton()}
+                </div>
+              </div>
+            </>
+          );
+        }
+
+        // display fulfill antReview modal
         return (
-          <>
-            <div className="peerReviewDashboardContainer">
-              <div>
-                <Title level={2}>Open AntReviews</Title>
-                {antReviews.length
-                  ? displayOpenAntReviews(antReviews)
-                  : displaySkeleton()}
-              </div>
-              <div>
-                {/* Completed Reviews == fulfilled && paid out reviews */}
-                <Title level={2}>My Reviews Awaiting Payout</Title>
-                {myCompletedReviews.length
-                  ? displayUnpaidReviews(
-                      myCompletedReviews,
-                      acceptedAntReviews,
-                      accounts
-                    )
-                  : displaySkeleton()}
-              </div>
-            </div>
-          </>
+          <FulfillAntReview
+            antReviewID={clickedAntReviewID}
+            accounts={accounts}
+            web3={web3}
+            antsReviewInstance={antsReviewInstance}
+          />
         );
       }
 
@@ -400,10 +445,12 @@ class Dashboard extends React.Component {
       }
 
       if (currentDisplay === "authorDashboard") {
-        const myCompletedReviews = isUserFulfiller(
-          acceptedAntReviews,
-          accounts
-        );
+        const isUserAntReviewAuthor = (antReviews, account) => {
+          return antReviews.filter(({ issuer }) => {
+            return issuer === account;
+          });
+        };
+        const myAntReviews = isUserAntReviewAuthor(antReviews, accounts);
 
         return (
           <>
@@ -412,22 +459,17 @@ class Dashboard extends React.Component {
                 <Title level={2}>AntReviews Awaiting Reviewers</Title>
                 {antReviews.length
                   ? displayMyUnreviewedReviews(
-                      antReviews,
+                      myAntReviews,
                       fulfilledAntReviews,
                       accounts
                     )
                   : displaySkeleton()}
               </div>
               <div>
-                {/* Completed Reviews == fulfilled && paid out reviews */}
                 <Title level={2}>Peer Reviewers Awaiting Payout</Title>
-                {/* {myCompletedReviews.length
-                  ? displayUnpaidReviews(
-                      myCompletedReviews,
-                      acceptedAntReviews,
-                      accounts
-                    )
-                  : displaySkeleton()} */}
+                {fulfilledAntReviews.length
+                  ? displayUnpaidReviewers(myAntReviews, fulfilledAntReviews)
+                  : displaySkeleton()}
               </div>
             </div>
           </>
