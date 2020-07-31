@@ -5,7 +5,7 @@ import weiToEth from "../../utils/weiToEth";
 import isUserIssuer from "../../utils/isUserIssuer";
 
 const AuthorProfile = ({ myAntReviews, acceptedAntReviews, accounts }) => {
-  const { Title, Paragraph } = Typography;
+  const { Title } = Typography;
 
   const displaySkeleton = () => (
     <Card style={{ width: 500, marginBottom: "2rem" }}>
@@ -23,18 +23,18 @@ const AuthorProfile = ({ myAntReviews, acceptedAntReviews, accounts }) => {
       );
     });
   };
-  let totalEthEarned = 0;
+  let totalEthPaidOut = 0;
   const myCompletedReviews = isUserIssuer(acceptedAntReviews, accounts);
 
   myCompletedReviews.forEach(
-    (completedReview) => (totalEthEarned += weiToEth(completedReview.amount))
+    (completedReview) => (totalEthPaidOut += weiToEth(completedReview.amount))
   );
 
   const statsTableData = [
     {
       key: "1",
       totalAntReviewsIssued: myAntReviews.length,
-      totalEthPaidOut: totalEthEarned.toFixed(4),
+      totalEthPaidOut: totalEthPaidOut.toFixed(4),
       totalAntReviewsCompleted: myCompletedReviews.length,
     },
   ];

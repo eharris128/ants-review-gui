@@ -1,12 +1,12 @@
 .profileContainer {
-    display: flex;
-    width: 80%;
-    flex-flow: row nowrap;
-    justify-content: space-around;
+  display: flex;
+  width: 80%;
+  flex-flow: row nowrap;
+  justify-content: space-around;
 }
 
 .rewardsContainer {
-    display: flex;
-    width: 13rem;
-    justify-content: space-around;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
 }

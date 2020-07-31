@@ -1,3 +1,10 @@
+.profileContainer {
+  display: flex;
+  width: 80%;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+}
+
 .statsContainer {
   width: 100%;
 }
