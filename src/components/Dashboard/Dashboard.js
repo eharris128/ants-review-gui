@@ -105,16 +105,27 @@ class Dashboard extends React.Component {
       .on("error", console.error);
   };
 
+  componentDidUpdate(prevProps) {
+    // reset ant review id being sent to the fulfill ant review component
+    if (this.props.currentDisplay !== prevProps.currentDisplay) {
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          clickedAntReviewID: null,
+        };
+      });
+    }
+  }
+
   render() {
     const { Title, Paragraph } = Typography;
-    const { currentDisplay } = this.props;
+    const { currentDisplay, setFulfillView } = this.props;
     console.log("Dashboard - currentDisplay", currentDisplay);
 
     const {
       web3,
       antsReviewInstance,
       antReviews,
-      displayFulfillAntReviewView,
       clickedAntReviewID,
       accounts,
       fulfilledAntReviews,
@@ -125,7 +136,7 @@ class Dashboard extends React.Component {
     // fulfill workflow
     const handleFulfillClick = (e, antReviewID) => {
       setClickedAntReviewID(antReviewID);
-      openFulfillAntReview();
+      setFulfillView();
     };
 
     const setClickedAntReviewID = (antReviewID) => {
@@ -133,15 +144,6 @@ class Dashboard extends React.Component {
         return {
           ...prevState,
           clickedAntReviewID: antReviewID,
-        };
-      });
-    };
-
-    const openFulfillAntReview = () => {
-      this.setState((prevState) => {
-        return {
-          ...prevState,
-          displayFulfillAntReviewView: true,
         };
       });
     };
@@ -290,18 +292,18 @@ class Dashboard extends React.Component {
       return myUnpaidFulfillments.length ? (
         // Do we want to display the unpaid fulfillment or the coupled ant review?
         // Could link to the ant review detail view from the fulfillment?
-          myUnpaidFulfillments.map((unpaidFulfillment, index) => {
+        myUnpaidFulfillments.map((unpaidFulfillment, index) => {
           const { data: peerReviewHash } = unpaidFulfillment;
           return (
             <Card key={index} title={peerReviewHash}>
               {/* TODO - Link to Details View */}
               <Button disabled={true}>View AntReview Details</Button>
             </Card>
-          )
+          );
         })
       ) : (
         <div>0 reviews currently awaiting payment.</div>
-      )
+      );
     };
 
     const displayUnpaidReviewers = (myAntReviews, fulfilledAntReviews) => {
@@ -397,41 +399,28 @@ class Dashboard extends React.Component {
           accounts
         );
 
-        // fulfill antReview has not been clicked
-        if (!displayFulfillAntReviewView) {
-          return (
-            <>
-              <div className="peerReviewDashboardContainer">
-                <div>
-                  <Title level={2}>Open AntReviews</Title>
-                  {antReviews.length
-                    ? displayOpenAntReviews(antReviews)
-                    : displaySkeleton()}
-                </div>
-                <div>
-                  {/* Completed Reviews == fulfilled && paid out reviews */}
-                  <Title level={2}>My Reviews Awaiting Payment</Title>
-                  {myCompletedReviews.length
-                    ? displayUnpaidReviews(
-                        myCompletedReviews,
-                        acceptedAntReviews,
-                        accounts
-                      )
-                    : displaySkeleton()}
-                </div>
-              </div>
-            </>
-          );
-        }
-
-        // display fulfill antReview modal
         return (
-          <FulfillAntReview
-            antReviewID={clickedAntReviewID}
-            accounts={accounts}
-            web3={web3}
-            antsReviewInstance={antsReviewInstance}
-          />
+          <>
+            <div className="peerReviewDashboardContainer">
+              <div>
+                <Title level={2}>Open AntReviews</Title>
+                {antReviews.length
+                  ? displayOpenAntReviews(antReviews)
+                  : displaySkeleton()}
+              </div>
+              <div>
+                {/* Completed Reviews == fulfilled && paid out reviews */}
+                <Title level={2}>My Reviews Awaiting Payment</Title>
+                {myCompletedReviews.length
+                  ? displayUnpaidReviews(
+                      myCompletedReviews,
+                      acceptedAntReviews,
+                      accounts
+                    )
+                  : displaySkeleton()}
+              </div>
+            </div>
+          </>
         );
       }
 
@@ -490,34 +479,32 @@ class Dashboard extends React.Component {
         );
       }
 
-      // fulfill antReview has not been clicked
-      if (!displayFulfillAntReviewView) {
+      if (currentDisplay === "fulfillAntReview") {
         return (
-          <>
-            <div>
-              <Title level={2}>Open AntReviews</Title>
-              {antReviews.length
-                ? displayOpenAntReviews(antReviews)
-                : displaySkeleton()}
-            </div>
-            <div>
-              <Title level={2}>Fulfilled AntReviews</Title>
-              {fulfilledAntReviews.length
-                ? displayFulfilledAntReviews(fulfilledAntReviews)
-                : displaySkeleton()}
-            </div>
-          </>
+          <FulfillAntReview
+            antReviewID={clickedAntReviewID}
+            accounts={accounts}
+            web3={web3}
+            antsReviewInstance={antsReviewInstance}
+          />
         );
       }
 
-      // display fulfill antReview modal
       return (
-        <FulfillAntReview
-          antReviewID={clickedAntReviewID}
-          accounts={accounts}
-          web3={web3}
-          antsReviewInstance={antsReviewInstance}
-        />
+        <>
+          <div>
+            <Title level={2}>Open AntReviews</Title>
+            {antReviews.length
+              ? displayOpenAntReviews(antReviews)
+              : displaySkeleton()}
+          </div>
+          <div>
+            <Title level={2}>Fulfilled AntReviews</Title>
+            {fulfilledAntReviews.length
+              ? displayFulfilledAntReviews(fulfilledAntReviews)
+              : displaySkeleton()}
+          </div>
+        </>
       );
     };
 

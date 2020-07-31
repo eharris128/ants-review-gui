@@ -4,7 +4,7 @@ import { Menu } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
-  // UploadOutlined,
+  UploadOutlined,
   ContainerOutlined,
   EditOutlined,
   PlusOutlined,
@@ -57,9 +57,9 @@ class Sider extends React.Component {
           <Menu.Item icon={<DashboardOutlined />} key="peerReviewerDashboard">
             Dashboard
           </Menu.Item>
-          {/* <Menu.Item icon={<UploadOutlined />} key="fulfillAntReview">
+          <Menu.Item icon={<UploadOutlined />} key="fulfillAntReview">
             Fulfill AntReview
-          </Menu.Item> */}
+          </Menu.Item>
           <Menu.Item icon={<UserOutlined />} key="peerReviewerProfile">
             Profile
           </Menu.Item>

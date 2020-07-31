@@ -23,9 +23,9 @@ const AntReviewLayout = () => {
     setSelectedView("issueAntReview");
   };
 
-  // const setFulfillView = () => {
-  //   setSelectedView('fulfillAntReview')
-  // }
+  const setFulfillView = () => {
+    setSelectedView('fulfillAntReview')
+  }
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -59,7 +59,7 @@ const AntReviewLayout = () => {
             }}
           >
             <Dashboard
-              // setFulfillView={setFulfillView}
+              setFulfillView={setFulfillView}
               currentDisplay={selectedView}
             />
           </div>
