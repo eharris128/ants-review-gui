@@ -128,8 +128,7 @@ class Dashboard extends React.Component {
   render() {
     const { Title, Paragraph } = Typography;
     const { currentDisplay, setFulfillView } = this.props;
-    console.log("Dashboard - currentDisplay", currentDisplay);
-
+    
     const {
       web3,
       antsReviewInstance,
@@ -473,7 +472,19 @@ class Dashboard extends React.Component {
         );
       }
       if (currentDisplay === "authorProfile") {
-        return <AuthorProfile />;
+        const isUserAntReviewAuthor = (antReviews, account) => {
+          return antReviews.filter(({ issuer }) => {
+            return issuer === account;
+          });
+        };
+        const myAntReviews = isUserAntReviewAuthor(antReviews, accounts);
+        return (
+          <AuthorProfile
+            myAntReviews={myAntReviews}
+            acceptedAntReviews={acceptedAntReviews}
+            accounts={accounts}
+          />
+        );
       }
 
       if (currentDisplay === "issueAntReview") {
