@@ -49,7 +49,7 @@ const FulfillAntReviewForm = ({
   const onFill = () => {
     form.setFieldsValue({
       ipfsHash: "QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t",
-      antReview: "QmZZQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t_17",
+      // antReview: "QmZZQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t_17",
     });
   };
 
@@ -96,9 +96,11 @@ const FulfillAntReviewForm = ({
           <Button type="primary" htmlType="submit">
             Submit
           </Button>
-          <Button type="link" htmlType="button" onClick={onFill}>
-            Fill form
-          </Button>
+          {!promptForAntReview ? (
+            <Button type="link" htmlType="button" onClick={onFill}>
+              Fill form
+            </Button>
+          ) : null}
         </Form.Item>
       </Form>
     </>
