@@ -4,12 +4,14 @@ import { Skeleton, Typography, Card, Button, Space } from "antd";
 
 import { FulfillAntReview } from "../FulfillAntReview";
 import getWeb3 from "../../utils/getWeb3";
+import isUserFulfiller from "../../utils/isUserFulfiller";
 import AntsReview from "../../contracts/AntsReview.json";
 import weiToEth from "../../utils/weiToEth";
 import IssueAntReview from "../IssueAntReview/IssueAntReview";
 import { PeerReviewerProfile } from "../PeerReviewerProfile";
 import { AuthorProfile } from "../AuthorProfile";
 
+import "./index.css";
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
@@ -263,6 +265,45 @@ class Dashboard extends React.Component {
       });
     };
 
+    const displayUnpaidReviews = (
+      myCompletedReviews,
+      acceptedAntReviews,
+      accounts
+    ) => {
+      const myFulfilledReviews = isUserFulfiller(fulfilledAntReviews, accounts);
+      const myUnpaidFulfillments = myFulfilledReviews.filter(
+        ({ antReview_id: fulfilledAntReviewID }) => {
+          // if the antReview_id of my fulfilledReview is not contained as the _antReviewId within the myCompletedReviews array
+          // then this is an unpaid (or expired with current design) fulfillment
+
+          const fulfillmentIsUnpaid = () => {
+            return !myCompletedReviews.some(
+              ({ _antReviewId: completedAntReviewID }) =>
+                completedAntReviewID === fulfilledAntReviewID
+            );
+          };
+
+          return fulfillmentIsUnpaid();
+        }
+      );
+
+      // Do we want to display the unpaid fulfillment or the coupled ant review?
+      // Could link to the ant review detail view from the fulfillment?
+      return myUnpaidFulfillments.map((unpaidFulfillment, index) => {
+        const { data: peerReviewHash } = unpaidFulfillment;
+        return (
+          <Card key={index} title={peerReviewHash}>
+            {/* TODO - Link to Details View */}
+            <Button
+              disabled={true}
+            >
+              View AntReview Details
+            </Button>
+          </Card>
+        );
+      });
+    };
+
     const displaySkeleton = () => (
       <Card style={{ width: 500, marginBottom: "2rem" }}>
         <Skeleton active />
@@ -272,6 +313,37 @@ class Dashboard extends React.Component {
     const displayMainContent = () => {
       // Display management
       // Warning - modification of the Sider menu item key names will need to be coupled with changes to the relevant display control below.
+      if (currentDisplay === "peerReviewerDashboard") {
+        const myCompletedReviews = isUserFulfiller(
+          acceptedAntReviews,
+          accounts
+        );
+
+        return (
+          <>
+            <div className="peerReviewDashboardContainer">
+              <div>
+                <Title level={2}>Open AntReviews</Title>
+                {antReviews.length
+                  ? displayOpenAntReviews(antReviews)
+                  : displaySkeleton()}
+              </div>
+              <div>
+                {/* Completed Reviews == fulfilled && paid out reviews */}
+                <Title level={2}>My Reviews Awaiting Payout</Title>
+                {myCompletedReviews.length
+                  ? displayUnpaidReviews(
+                      myCompletedReviews,
+                      acceptedAntReviews,
+                      accounts
+                    )
+                  : displaySkeleton()}
+              </div>
+            </div>
+          </>
+        );
+      }
+
       if (currentDisplay === "peerReviewerProfile") {
         return (
           <PeerReviewerProfile

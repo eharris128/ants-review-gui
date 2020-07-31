@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Skeleton, Typography, Card } from "antd";
 // import { DollarCircleFilled } from "@ant-design/icons";
 
+import isUserFulfiller from "../../utils/isUserFulfiller"
 import weiToEth from "../../utils/weiToEth";
 
 import "./index.css";
@@ -26,9 +27,7 @@ const PeerReviewerProfile = ({ acceptedAntReviews, accounts }) => {
       );
     });
   };
-  const myCompletedReviews = acceptedAntReviews.filter(
-    (fulfillment) => fulfillment.fulfiller === accounts
-  );
+  const myCompletedReviews = isUserFulfiller(acceptedAntReviews, accounts)
   let totalEthEarned = 0;
   myCompletedReviews.forEach(
     (completedReview) => (totalEthEarned += weiToEth(completedReview.amount))
