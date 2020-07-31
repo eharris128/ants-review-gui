@@ -32,12 +32,17 @@ const FulfillAntReviewForm = ({
 
   const onFinish = (values) => {
     const { ipfsHash, antReview } = values;
-
-    const targetAntReviewID = antReview.split("_")[1];
-    const submitPayload = {
+    let submitPayload = {
       ipfsHash,
-      antReview: targetAntReviewID,
     };
+    if (antReview) {
+      const targetAntReviewID = antReview.split("_")[1];
+      submitPayload = {
+        ...submitPayload,
+        antReview: targetAntReviewID,
+      };
+    }
+
     onSubmit(submitPayload);
   };
 

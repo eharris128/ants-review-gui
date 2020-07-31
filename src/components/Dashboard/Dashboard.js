@@ -490,6 +490,8 @@ class Dashboard extends React.Component {
       if (currentDisplay === "fulfillAntReview") {
         return (
           <FulfillAntReview
+            antReviews={antReviews}
+            cancelledAntReviews={cancelledAntReviews}
             antReviewID={clickedAntReviewID}
             accounts={accounts}
             web3={web3}

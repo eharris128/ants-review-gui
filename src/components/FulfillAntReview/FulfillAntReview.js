@@ -4,17 +4,15 @@ import FulfillAntReviewForm from "./FulFillAntReviewForm";
 import "./index.css";
 
 const filterAntReviews = (antReviews, cancelledAntReviews) => {
-  return antReviews.filter(antReview => {
-    const {
-      antReview_id: antReviewID,
-    } = antReview;
+  return antReviews.filter((antReview) => {
+    const { antReview_id: antReviewID } = antReview;
 
     const isAntReviewCancelled = cancelledAntReviews.find(
       (cancelledReview) => cancelledReview.antReview_id === antReviewID
     );
-    return !isAntReviewCancelled
-  })
-}
+    return !isAntReviewCancelled;
+  });
+};
 const FulfillAntReview = ({
   cancelledAntReviews,
   antReviews,
@@ -23,11 +21,13 @@ const FulfillAntReview = ({
   web3,
   antsReviewInstance,
 }) => {
-  const fulfillableAntReviews = filterAntReviews(antReviews, cancelledAntReviews)
-
   if (!antReviewID) {
+    const fulfillableAntReviews = filterAntReviews(
+      antReviews,
+      cancelledAntReviews
+    );
     const handleFormSubmit = async ({ ipfsHash, antReview }) => {
-      console.log("handle form submit", antReview, ipfsHash)
+      console.log("handle form submit", antReview, ipfsHash);
       await antsReviewInstance.methods
         .fulfillAntReview(antReview, ipfsHash)
         .send({ from: accounts });
@@ -35,7 +35,11 @@ const FulfillAntReview = ({
     return (
       <div className="fulfillAntReview">
         <h2>Fulfill AntReview</h2>
-        <FulfillAntReviewForm fulfillableAntReviews={fulfillableAntReviews} promptForAntReview={true} onSubmit={handleFormSubmit} />
+        <FulfillAntReviewForm
+          fulfillableAntReviews={fulfillableAntReviews}
+          promptForAntReview={true}
+          onSubmit={handleFormSubmit}
+        />
       </div>
     );
   }
@@ -48,7 +52,10 @@ const FulfillAntReview = ({
   return (
     <div className="fulfillAntReview">
       <h2>Fulfill AntReview</h2>
-      <FulfillAntReviewForm promptForAntReview={false} onSubmit={handleFormSubmit} />
+      <FulfillAntReviewForm
+        promptForAntReview={false}
+        onSubmit={handleFormSubmit}
+      />
     </div>
   );
 };
