@@ -529,7 +529,7 @@ class Dashboard extends React.Component {
         );
       }
 
-      if (currentDisplay === "details") {
+      if (currentDisplay === "antReviewDetails") {
         return <AntReviewDetailView antReview={selectedAntReviewDetails} />;
       }
 
