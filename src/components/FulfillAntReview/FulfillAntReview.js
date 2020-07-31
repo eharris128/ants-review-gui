@@ -9,6 +9,20 @@ const FulfillAntReview = ({
   web3,
   antsReviewInstance,
 }) => {
+  if (!antReviewID) {
+    const handleFormSubmit = async ({ ipfsHash }) => {
+      await antsReviewInstance.methods
+        .fulfillAntReview(antReviewID, ipfsHash)
+        .send({ from: accounts });
+    };
+    return (
+      <div className="fulfillAntReview">
+        <h2>Fulfill AntReview</h2>
+        <FulfillAntReviewForm promptForAntReview={true} onSubmit={handleFormSubmit} />
+      </div>
+    );
+  }
+
   const handleFormSubmit = async ({ ipfsHash }) => {
     await antsReviewInstance.methods
       .fulfillAntReview(antReviewID, ipfsHash)
@@ -17,7 +31,7 @@ const FulfillAntReview = ({
   return (
     <div className="fulfillAntReview">
       <h2>Fulfill AntReview</h2>
-      <FulfillAntReviewForm onSubmit={handleFormSubmit} />
+      <FulfillAntReviewForm promptForAntReview={false} onSubmit={handleFormSubmit} />
     </div>
   );
 };

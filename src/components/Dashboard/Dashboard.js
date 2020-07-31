@@ -108,12 +108,20 @@ class Dashboard extends React.Component {
   componentDidUpdate(prevProps) {
     // reset ant review id being sent to the fulfill ant review component
     if (this.props.currentDisplay !== prevProps.currentDisplay) {
-      this.setState((prevState) => {
-        return {
-          ...prevState,
-          clickedAntReviewID: null,
-        };
-      });
+      // if the initial 'dashboard' from which a user can click fulfill changes from the 'authorDashboard' display name
+      // then the 'authorDashboard' reference here must be updated.
+      const changeFromPeerDashToFullfill =
+        this.props.currentDisplay === "fulfillAntReview" &&
+        (prevProps.currentDisplay === "peerReviewerDashboard" ||
+          prevProps.currentDisplay === "authorDashboard");
+      if (!changeFromPeerDashToFullfill) {
+        this.setState((prevState) => {
+          return {
+            ...prevState,
+            clickedAntReviewID: null,
+          };
+        });
+      }
     }
   }
 

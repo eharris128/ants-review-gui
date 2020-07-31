@@ -2,7 +2,12 @@ import React from "react";
 import { Form, Input, Tooltip, Button } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 
-const FulfillAntReviewForm = ({ onSubmit, antReviewID }) => {
+const FulfillAntReviewForm = ({
+  onSubmit,
+  antReviewID,
+  promptForAntReview,
+}) => {
+  console.log('promptForAntReview', promptForAntReview)
   const [form] = Form.useForm();
 
   const layout = {
@@ -37,6 +42,20 @@ const FulfillAntReviewForm = ({ onSubmit, antReviewID }) => {
         name="basic"
         onFinish={onFinish}
       >
+        {!promptForAntReview ? null : (
+          // Stub
+          <Form.Item label="Ant Review" name="antReview">
+            <Input
+              placeholder="QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t"
+              suffix={
+                <Tooltip title="The hash of the reviewed paper.">
+                  <InfoCircleOutlined style={{ color: "rgba(0,0,0,.45)" }} />
+                </Tooltip>
+              }
+            />
+          </Form.Item>
+          // End Stub
+        )}
         <Form.Item
           label="IPFS Hash"
           name="ipfsHash"
