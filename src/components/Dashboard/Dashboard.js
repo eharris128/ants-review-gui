@@ -579,8 +579,8 @@ class Dashboard extends React.Component {
           <div>
             <Title level={2}>Welcome to Ants Reviews</Title>
             <Paragraph>
-              If you are an author, then you can click Issue Ant Review in the
-              top menu to create a new Ant Review.
+              If you are an author, then you can click `Issue AntReview` in the
+              top menu to create a new AntReview.
             </Paragraph>
             <Paragraph>
               If you are a peer reviewer, then you can navigate to the Peer
