@@ -5,4 +5,4 @@ const isContractInteractable = (
   accounts
 ) => web3Instance && networkID && antsReviewInstance && accounts;
 
-export default isContractInteractable
+export default isContractInteractable;

@@ -14,12 +14,15 @@ import { AntReviewDetailView } from "../AntReviewDetailView";
 import { FulfillmentDetails } from "../FulfillmentDetails";
 
 import "./index.css";
+
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       web3: null,
+      noWeb3: null,
+      networkID: null,
       antsReviewInstance: null,
       antReviews: [],
       fulfilledAntReviews: [],
@@ -34,33 +37,35 @@ class Dashboard extends React.Component {
     try {
       // Get network provider and web3 instance.
       const web3 = await getWeb3();
+      if (!web3) {
+        this.setState({ noWeb3: true });
+      } else {
+        // Use web3 to get the user's accounts.
+        const accounts = await web3.eth.getAccounts();
 
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
+        // Get the contract instance.
+        const networkId = await web3.eth.net.getId();
+        if (networkId === 4) {
+          const deployedNetwork = AntsReview.networks[networkId];
+          const instance = new web3.eth.Contract(
+            AntsReview.abi,
+            deployedNetwork && deployedNetwork.address
+          );
 
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = AntsReview.networks[networkId];
-      const instance = new web3.eth.Contract(
-        AntsReview.abi,
-        deployedNetwork && deployedNetwork.address
-      );
-
-      // Set contract to the state
-      this.setState({
-        web3,
-        antsReviewInstance: instance,
-        accounts: accounts.length ? accounts[0] : accounts,
-      });
-      this.listenAntReviewIssuedEvent(this);
-      this.listenAntReviewFulfilledEvent(this);
-      this.listenAntReviewCancelledEvent(this);
-      this.listenAntReviewAcceptedEvent(this);
+          // Set contract to the state
+          this.setState({
+            web3,
+            networkID: networkId,
+            antsReviewInstance: instance,
+            accounts: accounts.length ? accounts[0] : accounts,
+          });
+          this.listenAntReviewIssuedEvent(this);
+          this.listenAntReviewFulfilledEvent(this);
+          this.listenAntReviewCancelledEvent(this);
+          this.listenAntReviewAcceptedEvent(this);
+        }
+      }
     } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`
-      );
       console.error(error);
     }
   };
@@ -140,6 +145,8 @@ class Dashboard extends React.Component {
 
     const {
       web3,
+      networkID,
+      noWeb3,
       antsReviewInstance,
       antReviews,
       clickedAntReviewID,
@@ -151,6 +158,10 @@ class Dashboard extends React.Component {
       selectedFulfillmentDetails,
     } = this.state;
 
+    const validNetworks = [4];
+    const hasValidNetwork = validNetworks.some(
+      (validNetwork) => networkID === validNetwork
+    );
     // fulfill workflow
     const handleFulfillClick = (e, antReviewID) => {
       setClickedAntReviewID(antReviewID);
@@ -264,55 +275,6 @@ class Dashboard extends React.Component {
       });
     };
 
-    const displayFulfilledAntReviews = (fulfilledAntReviews) => {
-      // TODO - only display / return fulfillments that are still available (e.g. the (entire?) reward has not been paid out yet)
-      return fulfilledAntReviews.map((fulfilledAntReview, index) => {
-        const { antReview_id: antReviewID } = fulfilledAntReview;
-
-        // ONLY if the fulfillment has not already been accepted
-        // THEN we check to confirm that it is the current user's review
-        const skipDisplayingAntReview = acceptedAntReviews.find(
-          (acceptedReview) => acceptedReview._antReviewId === antReviewID
-        );
-        if (skipDisplayingAntReview) {
-          return null;
-        }
-        // ONLY if the antReviewID of the current fulfillment maps to an antReview in the antReviews state variable where the issuer of that antReview is the current user
-        // THEN we display the card block
-        const isCurrentUsersFulfilledAntReview = (antReviewID) =>
-          antReviews.filter((review) => {
-            const matchingReviewIDs = review.antReview_id === antReviewID;
-            const issuerAndCurrentUserMatch = review.issuer === accounts;
-            return matchingReviewIDs && issuerAndCurrentUserMatch;
-          }).length;
-
-        if (!isCurrentUsersFulfilledAntReview(antReviewID)) {
-          return null;
-        }
-
-        const {
-          data: ipfsHash,
-          fulfiller,
-          fulfillment_id: fulfillmentID,
-        } = fulfilledAntReview;
-
-        return (
-          <Card
-            key={index}
-            title={ipfsHash}
-            style={{ width: 500, marginBottom: "2rem" }}
-          >
-            <p>Peer Reviewer - {fulfiller}</p>
-            <Button
-              onClick={(e) => handleAcceptClick(e, antReviewID, fulfillmentID)}
-            >
-              Accept
-            </Button>
-          </Card>
-        );
-      });
-    };
-
     const displayUnpaidReviews = (
       myCompletedReviews,
       acceptedAntReviews,
@@ -379,7 +341,7 @@ class Dashboard extends React.Component {
             <Paragraph> Peer Reviewer - {fulfiller}</Paragraph>
             <Space>
               {/* TODO - Link to Edit View */}
-              <Button disabled={true}>Edit AntReview</Button>
+              {/* <Button disabled={true}>Edit AntReview</Button> */}
               <Button
                 onClick={(e) =>
                   handleFulfillmentDetailsClick(e, unpaidReviewer)
@@ -435,7 +397,7 @@ class Dashboard extends React.Component {
                 Cancel
               </Button>
               {/* TODO - Link to Edit View */}
-              <Button disabled={true}>Edit AntReview</Button>
+              {/* <Button disabled={true}>Edit AntReview</Button> */}
               <Button
                 onClick={(e) =>
                   handleAntReviewDetailsClick(e, unfilledAntReview)
@@ -456,6 +418,33 @@ class Dashboard extends React.Component {
     );
 
     const displayMainContent = () => {
+      if (noWeb3) {
+        return (
+          <div>
+            <Title level={2}>Welcome!</Title>
+            <Paragraph>
+              Ants Review requires the browser extension MetaMask. Please
+              <a href="https://metamask.io/"> download MetaMask</a> to use this
+              application.
+            </Paragraph>
+          </div>
+        );
+      }
+      if (!hasValidNetwork) {
+        return (
+          <div>
+            <Title level={2}>Welcome!</Title>
+            <Paragraph>
+              Ants Review only works on the Ethereum Rinkeby Test Network.
+            </Paragraph>
+            <Paragraph>
+              Please change your network to Rinkeby and refresh this page to
+              interact with the application.
+            </Paragraph>
+          </div>
+        );
+      }
+
       // Display management
       // Warning - modification of the Sider menu item key names will need to be coupled with changes to the relevant display control below.
       if (currentDisplay === "peerReviewerDashboard") {
@@ -580,16 +569,15 @@ class Dashboard extends React.Component {
       return (
         <>
           <div>
-            <Title level={2}>Open AntReviews</Title>
-            {antReviews.length
-              ? displayOpenAntReviews(antReviews)
-              : displaySkeleton()}
-          </div>
-          <div>
-            <Title level={2}>Fulfilled AntReviews</Title>
-            {fulfilledAntReviews.length
-              ? displayFulfilledAntReviews(fulfilledAntReviews)
-              : displaySkeleton()}
+            <Title level={2}>Welcome to Ants Reviews</Title>
+            <Paragraph>
+              If you are an author, then you can click Issue Ant Review in the
+              top menu to create a new Ant Review.
+            </Paragraph>
+            <Paragraph>
+              If you are a peer reviewer, then you can navigate to the Peer
+              Reviewers Dashboard via the left hand navigation menu.
+            </Paragraph>
           </div>
         </>
       );

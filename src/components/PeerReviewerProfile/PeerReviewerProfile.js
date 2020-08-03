@@ -1,7 +1,6 @@
 import React from "react";
 
 import { Skeleton, Typography, Card, Table } from "antd";
-// import { DollarCircleFilled } from "@ant-design/icons";
 
 import isUserFulfiller from "../../utils/isUserFulfiller";
 import weiToEth from "../../utils/weiToEth";
@@ -9,7 +8,7 @@ import weiToEth from "../../utils/weiToEth";
 import "./index.css";
 
 const PeerReviewerProfile = ({ acceptedAntReviews, accounts }) => {
-  const { Title, Paragraph } = Typography;
+  const { Title } = Typography;
   const displaySkeleton = () => (
     <Card style={{ width: 500, marginBottom: "2rem" }}>
       <Skeleton active />
