@@ -67,7 +67,7 @@ const AuthorProfile = ({ myAntReviews, acceptedAntReviews, accounts }) => {
         </div>
         <div>
           {/* Completed Reviews == fulfilled && paid out reviews */}
-          <Title level={2}>Completed AntReviews</Title>
+          <Title level={2}>My Completed AntReviews</Title>
           {myCompletedReviews.length
             ? displayMyCompletedReviews(myCompletedReviews)
             : null}
