@@ -1,17 +1,12 @@
 import React from "react";
 
-import { Skeleton, Typography, Card, Table } from "antd";
+import { Typography, Card, Table } from "antd";
 import weiToEth from "../../utils/weiToEth";
 import isUserIssuer from "../../utils/isUserIssuer";
 
 const AuthorProfile = ({ myAntReviews, acceptedAntReviews, accounts }) => {
   const { Title } = Typography;
 
-  const displaySkeleton = () => (
-    <Card style={{ width: 500, marginBottom: "2rem" }}>
-      <Skeleton active />
-    </Card>
-  );
   const displayMyCompletedReviews = (myCompletedReviews) => {
     return myCompletedReviews.map((completedReview) => {
       const { fulfiller, amount: rewardAmount } = completedReview;
@@ -75,7 +70,7 @@ const AuthorProfile = ({ myAntReviews, acceptedAntReviews, accounts }) => {
           <Title level={2}>Completed AntReviews</Title>
           {myCompletedReviews.length
             ? displayMyCompletedReviews(myCompletedReviews)
-            : displaySkeleton()}
+            : null}
         </div>
       </div>
     </>

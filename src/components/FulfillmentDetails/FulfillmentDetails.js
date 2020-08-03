@@ -7,7 +7,6 @@ import "./index.css";
 const FulfillmentDetails = ({ fulfillment }) => {
   const { Title, Paragraph } = Typography;
 
-  console.log("fulfillment", fulfillment);
   const { data: paperHash, fulfiller } = fulfillment;
   return (
     <div className="detailsContainer">

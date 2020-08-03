@@ -36,6 +36,7 @@ const FulfillAntReviewForm = ({
       ipfsHash,
     };
     if (antReview) {
+      // example ID - "QmZZQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t_17"
       const targetAntReviewID = antReview.split("_")[1];
       submitPayload = {
         ...submitPayload,
@@ -49,7 +50,6 @@ const FulfillAntReviewForm = ({
   const onFill = () => {
     form.setFieldsValue({
       ipfsHash: "QmWWQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t",
-      // antReview: "QmZZQSuPMS6aXCbZKpEjPHPUZN2NjB3YrhJTHsV4X3vb2t_17",
     });
   };
 

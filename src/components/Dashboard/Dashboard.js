@@ -207,16 +207,24 @@ class Dashboard extends React.Component {
     };
 
     const cancelAntReview = async (antReviewID) => {
-      await antsReviewInstance.methods
-        .cancelAntReview(antReviewID)
-        .send({ from: accounts });
+      try {
+        await antsReviewInstance.methods
+          .cancelAntReview(antReviewID)
+          .send({ from: accounts });
+      } catch (e) {
+        console.error("Failed to send cancel tx", e);
+      }
     };
 
     // accept workflow
     const acceptAntReview = async (antReviewID, fulfillmentID) => {
-      await antsReviewInstance.methods
-        .acceptFulfillment(antReviewID, fulfillmentID)
-        .send({ from: accounts });
+      try {
+        await antsReviewInstance.methods
+          .acceptFulfillment(antReviewID, fulfillmentID)
+          .send({ from: accounts });
+      } catch (e) {
+        console.error("Failed to send accept tx", e);
+      }
     };
 
     const handleAcceptClick = (e, antReviewID, fulfillmentID) => {
@@ -471,7 +479,7 @@ class Dashboard extends React.Component {
                       acceptedAntReviews,
                       accounts
                     )
-                  : displaySkeleton()}
+                  : null}
               </div>
             </div>
           </>

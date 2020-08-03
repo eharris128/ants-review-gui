@@ -24,6 +24,7 @@ const AntReviewForm = (props) => {
       ethRewardAmount,
       dueDate: dueDateInUnix,
     };
+
     onSubmit(submitPayload);
   };
 
@@ -70,7 +71,7 @@ const AntReviewForm = (props) => {
           ]}
         >
           <Input
-            placeholder="0.1"
+            placeholder="0.01"
             suffix={
               <Tooltip title="The amount of ETH you want to provide to the peer reviewer.">
                 <InfoCircleOutlined style={{ color: "rgba(0,0,0,.45)" }} />

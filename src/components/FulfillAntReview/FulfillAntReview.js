@@ -27,10 +27,13 @@ const FulfillAntReview = ({
       cancelledAntReviews
     );
     const handleFormSubmit = async ({ ipfsHash, antReview }) => {
-      console.log("handle form submit", antReview, ipfsHash);
-      await antsReviewInstance.methods
-        .fulfillAntReview(antReview, ipfsHash)
-        .send({ from: accounts });
+      try {
+        await antsReviewInstance.methods
+          .fulfillAntReview(antReview, ipfsHash)
+          .send({ from: accounts });
+      } catch (e) {
+        console.error("Failed to send fulfill tx ", e);
+      }
     };
     return (
       <div className="fulfillAntReview">
@@ -45,9 +48,13 @@ const FulfillAntReview = ({
   }
 
   const handleFormSubmit = async ({ ipfsHash }) => {
-    await antsReviewInstance.methods
-      .fulfillAntReview(antReviewID, ipfsHash)
-      .send({ from: accounts });
+    try {
+      await antsReviewInstance.methods
+        .fulfillAntReview(antReviewID, ipfsHash)
+        .send({ from: accounts });
+    } catch (e) {
+      console.error("Failed to send fulfill tx ", e);
+    }
   };
   return (
     <div className="fulfillAntReview">

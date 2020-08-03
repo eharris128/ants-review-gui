@@ -8,7 +8,6 @@ import "./index.css";
 const AntReviewDetailView = ({ antReview }) => {
   const { Title, Paragraph } = Typography;
 
-  console.log("antReview", antReview);
   const { data: paperHash, amount: rewardAmount, issuer } = antReview;
   return (
     <div className="detailsContainer">

@@ -3,12 +3,7 @@ import React, { useState } from "react";
 import AntReviewForm from "./AntReviewForm";
 import "./index.css";
 
-const sendIssueTx = async (
-  web3,
-  antsReviewInstance,
-  accounts,
-  antReview
-) => {
+const sendIssueTx = async (web3, antsReviewInstance, accounts, antReview) => {
   const { ipfsHash, ethRewardAmount, dueDate } = antReview;
 
   await antsReviewInstance.methods.issueAntReview(ipfsHash, dueDate).send({
@@ -26,12 +21,11 @@ const IssueAntReview = ({
   const [antReview, setAntReview] = useState(null);
   async function handleFormSubmit(newAntReview) {
     setAntReview(newAntReview);
-      await sendIssueTx(
-        web3,
-        antsReviewInstance,
-        accounts,
-        newAntReview
-      );
+    try {
+      await sendIssueTx(web3, antsReviewInstance, accounts, newAntReview);
+    } catch (e) {
+      console.error("Failed to send issue tx ", e);
+    }
   }
   return (
     <div className="issueAntReview">
