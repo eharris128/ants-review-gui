@@ -5,11 +5,19 @@ import "./index.css";
 
 const sendIssueTx = async (web3, antsReviewInstance, accounts, antReview) => {
   const { ipfsHash, ethRewardAmount, dueDate } = antReview;
-
-  await antsReviewInstance.methods.issueAntReview(ipfsHash, dueDate).send({
-    from: accounts,
-    value: web3.utils.toWei(ethRewardAmount.toString(), "ether"),
-  });
+  // const issueAntReviewPayload = {
+  //   _approver: [accounts],
+  //   _issuers: accounts,
+  //   _paperHash: ipfsHash,
+  //   _requirementsHash: ipfsHash,
+  //   _deadline: dueDate,
+  // };
+  await antsReviewInstance.methods
+    .issueAntReview([accounts], accounts, ipfsHash, ipfsHash, dueDate)
+    .send({
+      from: accounts,
+      value: web3.utils.toWei(ethRewardAmount.toString(), "ether"),
+    });
 };
 const IssueAntReview = ({
   antReviewID,
@@ -17,7 +25,6 @@ const IssueAntReview = ({
   web3,
   antsReviewInstance,
 }) => {
-
   const [antReview, setAntReview] = useState(null);
   async function handleFormSubmit(newAntReview) {
     setAntReview(newAntReview);
