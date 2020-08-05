@@ -29,7 +29,7 @@ class Dashboard extends React.Component {
       antReviews: [],
       fulfilledAntReviews: [],
       displayFulfillAntReviewView: false,
-      cancelledAntReviews: [],
+      // cancelledAntReviews: [],
       acceptedAntReviews: [],
       selectedAntReviewDetails: null,
       selectedFulfillmentDetails: null,
@@ -47,7 +47,8 @@ class Dashboard extends React.Component {
 
         // Get the contract instance.
         const networkId = await web3.eth.net.getId();
-        if (networkId === 4) {
+        // PRIMARY NETWORK VALIDATOR
+        if (networkId === 42) {
           const deployedNetwork = AntsReview.networks[networkId];
           const instance = new web3.eth.Contract(
             AntsReview.abi,
@@ -160,7 +161,8 @@ class Dashboard extends React.Component {
       selectedFulfillmentDetails,
     } = this.state;
 
-    const validNetworks = [4];
+    // SECONDARY NETWORK VALIDATOR
+    const validNetworks = [42];
     const hasValidNetwork = validNetworks.some(
       (validNetwork) => networkID === validNetwork
     );
@@ -445,10 +447,10 @@ class Dashboard extends React.Component {
           <div>
             <Title level={2}>Welcome!</Title>
             <Paragraph>
-              Ants Review only works on the Ethereum Rinkeby Test Network.
+              Ants Review only works on the Ethereum Kovan Test Network.
             </Paragraph>
             <Paragraph>
-              Please change your network to Rinkeby and refresh this page to
+              Please change your network to Kovan and refresh this page to
               interact with the application.
             </Paragraph>
           </div>
@@ -458,7 +460,6 @@ class Dashboard extends React.Component {
       // Display management
       // Warning - modification of the Sider menu item key names will need to be coupled with changes to the relevant display control below.
       if (currentDisplay === "contribute") {
-        console.log("wot")
         return <Contribute />
       }
       
