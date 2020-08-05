@@ -13,6 +13,7 @@ import { AuthorProfile } from "../AuthorProfile";
 import { AntReviewDetailView } from "../AntReviewDetailView";
 import { FulfillmentDetails } from "../FulfillmentDetails";
 import { Faucet } from '../Faucet'
+import { Contribute } from'../Contribute'
 
 import "./index.css";
 
@@ -456,6 +457,11 @@ class Dashboard extends React.Component {
 
       // Display management
       // Warning - modification of the Sider menu item key names will need to be coupled with changes to the relevant display control below.
+      if (currentDisplay === "contribute") {
+        console.log("wot")
+        return <Contribute />
+      }
+      
       if (currentDisplay === "faucet") {
         return <Faucet />
       }

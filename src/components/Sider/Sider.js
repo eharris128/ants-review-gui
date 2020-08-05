@@ -8,6 +8,8 @@ import {
   ContainerOutlined,
   EditOutlined,
   PlusOutlined,
+  DollarCircleOutlined,
+  TeamOutlined
 } from "@ant-design/icons";
 const { SubMenu } = Menu;
 
@@ -64,8 +66,11 @@ class Sider extends React.Component {
             Profile
           </Menu.Item>
         </SubMenu>
-        <Menu.Item icon={<DashboardOutlined />} key="faucet">
+        <Menu.Item icon={<DollarCircleOutlined />} key="faucet">
           Faucet
+        </Menu.Item>
+        <Menu.Item icon={<TeamOutlined />} key="contribute">
+          Contribute
         </Menu.Item>
       </Menu>
     );
