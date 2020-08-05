@@ -12,6 +12,7 @@ import { PeerReviewerProfile } from "../PeerReviewerProfile";
 import { AuthorProfile } from "../AuthorProfile";
 import { AntReviewDetailView } from "../AntReviewDetailView";
 import { FulfillmentDetails } from "../FulfillmentDetails";
+import { Faucet } from '../Faucet'
 
 import "./index.css";
 
@@ -455,6 +456,10 @@ class Dashboard extends React.Component {
 
       // Display management
       // Warning - modification of the Sider menu item key names will need to be coupled with changes to the relevant display control below.
+      if (currentDisplay === "faucet") {
+        return <Faucet />
+      }
+
       if (currentDisplay === "peerReviewerDashboard") {
         const myCompletedReviews = isUserFulfiller(
           acceptedAntReviews,
@@ -577,7 +582,7 @@ class Dashboard extends React.Component {
       return (
         <>
           <div>
-            <Title level={2}>Welcome to Ants Reviews</Title>
+            <Title level={2}>Welcome to Ants Review</Title>
             <Paragraph>
               If you are an author, then you can click `Issue AntReview` in the
               top menu to create a new AntReview.

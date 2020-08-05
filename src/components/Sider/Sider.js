@@ -64,6 +64,9 @@ class Sider extends React.Component {
             Profile
           </Menu.Item>
         </SubMenu>
+        <Menu.Item icon={<DashboardOutlined />} key="faucet">
+          Faucet
+        </Menu.Item>
       </Menu>
     );
   }
